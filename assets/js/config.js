@@ -3,7 +3,7 @@ window.APP_CONFIG = {
     // API Base URL - switches between local development and production
     API_BASE: window.location.hostname === 'localhost'
         ? 'http://localhost:3000'
-        : 'https://stockalerts-backend-35t8rmgza-spataray-5609s-projects.vercel.app',
+        : 'https://stockalerts-backend-n4hdollex-spataray-5609s-projects.vercel.app',
 
     // App metadata
     APP_NAME: 'StockAlerts',
