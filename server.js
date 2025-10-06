@@ -52,8 +52,15 @@ app.use(helmet({
 }));
 
 app.use(cors({
-    origin: process.env.FRONTEND_URL || true,
-    credentials: true
+    origin: [
+        'http://localhost:3000',
+        'https://spataray.gitlab.io',
+        'https://stockalerts-backend-g784hxipc-spataray-5609s-projects.vercel.app',
+        process.env.FRONTEND_URL
+    ].filter(Boolean),
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
 app.use(express.json({ limit: '10mb' }));
