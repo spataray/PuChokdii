@@ -2,6 +2,7 @@ const express = require('express');
 const jwt = require('jsonwebtoken');
 const { v4: uuidv4 } = require('uuid');
 const nodemailer = require('nodemailer');
+const { google } = require('googleapis');
 const userDb = require('../database/users');
 
 const router = express.Router();
@@ -9,35 +10,59 @@ const router = express.Router();
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000';
 
-// Email configuration
-const emailConfig = {
-    host: process.env.EMAIL_HOST || 'smtp.gmail.com',
-    port: process.env.EMAIL_PORT || 587,
-    secure: false,
-    auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS
-    }
-};
+// OAuth2 Email configuration
+const OAUTH2_CLIENT_ID = process.env.OAUTH2_CLIENT_ID;
+const OAUTH2_CLIENT_SECRET = process.env.OAUTH2_CLIENT_SECRET;
+const OAUTH2_REFRESH_TOKEN = process.env.OAUTH2_REFRESH_TOKEN;
+const EMAIL_USER = process.env.EMAIL_USER;
+const REDIRECT_URI = 'https://developers.google.com/oauthplayground';
 
 let transporter = null;
 
-function initializeEmailTransporter() {
-    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-        console.warn('⚠️ Email credentials not configured - magic links will be logged to console');
+async function initializeEmailTransporter() {
+    // Check if OAuth2 credentials are available
+    if (!OAUTH2_CLIENT_ID || !OAUTH2_CLIENT_SECRET || !OAUTH2_REFRESH_TOKEN || !EMAIL_USER) {
+        console.warn('⚠️ OAuth2 email credentials not configured - magic links will be logged to console');
+        console.warn('Required environment variables: OAUTH2_CLIENT_ID, OAUTH2_CLIENT_SECRET, OAUTH2_REFRESH_TOKEN, EMAIL_USER');
         return null;
     }
 
     try {
-        return nodemailer.createTransporter(emailConfig);
+        const oAuth2Client = new google.auth.OAuth2(
+            OAUTH2_CLIENT_ID,
+            OAUTH2_CLIENT_SECRET,
+            REDIRECT_URI
+        );
+
+        oAuth2Client.setCredentials({
+            refresh_token: OAUTH2_REFRESH_TOKEN
+        });
+
+        const accessToken = await oAuth2Client.getAccessToken();
+
+        const transporter = nodemailer.createTransporter({
+            service: 'gmail',
+            auth: {
+                type: 'OAuth2',
+                user: EMAIL_USER,
+                clientId: OAUTH2_CLIENT_ID,
+                clientSecret: OAUTH2_CLIENT_SECRET,
+                refreshToken: OAUTH2_REFRESH_TOKEN,
+                accessToken: accessToken.token,
+            },
+        });
+
+        return transporter;
     } catch (error) {
-        console.error('Failed to initialize email transporter:', error);
+        console.error('Failed to initialize OAuth2 email transporter:', error);
         return null;
     }
 }
 
-// Initialize email transporter
-transporter = initializeEmailTransporter();
+// Initialize email transporter (async)
+(async () => {
+    transporter = await initializeEmailTransporter();
+})();
 
 // Send magic link
 router.post('/send-magic-link', async (req, res) => {
@@ -71,9 +96,12 @@ router.post('/send-magic-link', async (req, res) => {
         await userDb.createMagicLink(email, token);
 
         // Send email or log to console
-        if (transporter) {
+        // Create fresh transporter for OAuth2 (access tokens can expire)
+        const emailTransporter = await initializeEmailTransporter();
+
+        if (emailTransporter) {
             const mailOptions = {
-                from: process.env.EMAIL_USER,
+                from: EMAIL_USER,
                 to: email,
                 subject: 'Your StockAlerts Login Link',
                 html: `
@@ -108,8 +136,8 @@ router.post('/send-magic-link', async (req, res) => {
                 `
             };
 
-            await transporter.sendMail(mailOptions);
-            console.log(`📧 Magic link sent to ${email}`);
+            await emailTransporter.sendMail(mailOptions);
+            console.log(`📧 Magic link sent to ${email} via OAuth2`);
         } else {
             // Development mode - log the magic link
             console.log(`🔗 Magic link for ${email}: ${magicLink}`);
