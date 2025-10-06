@@ -62,77 +62,82 @@ function initializeEmail() {
         }
     });
 }
+
 function formatTrend(value) {
-const sign = value >= 0 ? ‘+’ : ‘’;
-return `${sign}${value.toFixed(1)}%`;
+    const sign = value >= 0 ? '+' : '';
+    return `${sign}${value.toFixed(1)}%`;
 }
+
 function getTrendEmoji(value) {
-if (value > 5) return ‘📈’;
-if (value < -5) return ‘📉’;
-return ‘➡️’;
+    if (value > 5) return '📈';
+    if (value < -5) return '📉';
+    return '➡️';
 }
 async function sendAlert(alertData) {
-const {
-symbol,
-name,
-price,
-change,
-changePercent,
-threshold,
-trends,
-chartUrl
-} = alertData;
-// Format the SMS message
-const message = `
+    const {
+        symbol,
+        name,
+        price,
+        change,
+        changePercent,
+        threshold,
+        trends,
+        chartUrl
+    } = alertData;
+
+    // Format the SMS message
+    const message = `
 🔔 ${symbol} Alert: $${price.toFixed(2)} (${changePercent})
 ${name}
 Threshold: $${threshold.toFixed(2)}
 📊 Trends:
-${getTrendEmoji(trends[‘3mo’])} 3mo: ${formatTrend(trends[‘3mo’])}
-${getTrendEmoji(trends[‘6mo’])} 6mo: ${formatTrend(trends[‘6mo’])}
-${getTrendEmoji(trends[‘12mo’])} 12mo: ${formatTrend(trends[‘12mo’])}
+${getTrendEmoji(trends['3mo'])} 3mo: ${formatTrend(trends['3mo'])}
+${getTrendEmoji(trends['6mo'])} 6mo: ${formatTrend(trends['6mo'])}
+${getTrendEmoji(trends['12mo'])} 12mo: ${formatTrend(trends['12mo'])}
 📈 Chart: ${chartUrl}
 `.trim();
-console.log(’\n’ + ‘=’.repeat(50));
-console.log(‘SENDING ALERT:’);
-console.log(’=’.repeat(50));
-console.log(message);
-console.log(’=’.repeat(50) + ‘\n’);
-// Initialize email transporter if not already done
-if (!transporter) {
-    transporter = initializeEmail();
-}
 
-// Send email-to-SMS if email is configured
-if (transporter && alertPhone) {
-    try {
-        // Clean phone number and get carrier gateway
-        const cleanPhone = alertPhone.replace(/\D/g, '');
-        const gateway = getCarrierGateway(alertPhone);
-        const emailAddress = `${cleanPhone}@${gateway}`;
-        const carrier = detectCarrier(alertPhone);
+    console.log('\n' + '='.repeat(50));
+    console.log('SENDING ALERT:');
+    console.log('='.repeat(50));
+    console.log(message);
+    console.log('='.repeat(50) + '\n');
 
-        console.log(`📱 Sending to: ${emailAddress} (detected carrier: ${carrier})`);
+    // Initialize email transporter if not already done
+    if (!transporter) {
+        transporter = initializeEmail();
+    }
 
-        const mailOptions = {
-            from: emailUser,
-            to: emailAddress,
-            subject: `${symbol} Alert`, // Keep subject short for SMS
-            text: message
-        };
+    // Send email-to-SMS if email is configured
+    if (transporter && alertPhone) {
+        try {
+            // Clean phone number and get carrier gateway
+            const cleanPhone = alertPhone.replace(/\D/g, '');
+            const gateway = getCarrierGateway(alertPhone);
+            const emailAddress = `${cleanPhone}@${gateway}`;
+            const carrier = detectCarrier(alertPhone);
 
-        const result = await transporter.sendMail(mailOptions);
-        console.log(`✓ Email-to-SMS sent successfully! Message ID: ${result.messageId}`);
-        return true;
-    } catch (error) {
-        console.error('✗ Error sending email-to-SMS:', error.message);
+            console.log(`📱 Sending to: ${emailAddress} (detected carrier: ${carrier})`);
+
+            const mailOptions = {
+                from: emailUser,
+                to: emailAddress,
+                subject: `${symbol} Alert`, // Keep subject short for SMS
+                text: message
+            };
+
+            const result = await transporter.sendMail(mailOptions);
+            console.log(`✓ Email-to-SMS sent successfully! Message ID: ${result.messageId}`);
+            return true;
+        } catch (error) {
+            console.error('✗ Error sending email-to-SMS:', error.message);
+            return false;
+        }
+    } else {
+        console.log('⚠ Test mode: Email-to-SMS would be sent to', alertPhone || 'NOT_CONFIGURED');
+        console.log('⚠ Configure email credentials in .env to enable email-to-SMS');
         return false;
     }
-} else {
-    console.log('⚠ Test mode: Email-to-SMS would be sent to', alertPhone || 'NOT_CONFIGURED');
-    console.log('⚠ Configure email credentials in .env to enable email-to-SMS');
-    return false;
-}
 }
 
 // Test function to send a test alert
