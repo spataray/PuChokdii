@@ -1,7 +1,8 @@
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 
-const DB_PATH = path.join(__dirname, 'stockalerts.db');
+// Use in-memory database for Vercel serverless environment
+const DB_PATH = process.env.NODE_ENV === 'production' ? ':memory:' : path.join(__dirname, 'stockalerts.db');
 
 class Database {
     constructor() {
@@ -15,7 +16,8 @@ class Database {
                     console.error('Error opening database:', err);
                     reject(err);
                 } else {
-                    console.log('📦 Connected to SQLite database');
+                    const dbType = DB_PATH === ':memory:' ? 'in-memory (serverless)' : 'file-based';
+                    console.log(`📦 Connected to SQLite database (${dbType})`);
                     resolve();
                 }
             });
