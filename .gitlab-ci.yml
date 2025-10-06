@@ -1,21 +1,6 @@
-# GitLab CI/CD Pipeline for StockAlerts & PuChokDii
-# Builds and deploys both platforms to GitLab Pages
-
-stages:
-  - build
-  - deploy
-
-variables:
-  NODE_VERSION: "18"
-
-# Build job
-build:
-  stage: build
-  image: node:${NODE_VERSION}
+# Simple GitLab Pages deployment for StockAlerts & PuChokDii
+pages:
   script:
-    # Install dependencies
-    - npm ci
-
     # Create public directory for GitLab Pages
     - mkdir -p public
 
@@ -23,7 +8,6 @@ build:
     - cp index.html public/
     - cp dashboard.html public/
     - cp -r assets public/
-    - cp vercel.json public/
 
     # Copy PuChokDii to subdirectory
     - cp -r puchokdii public/
@@ -31,7 +15,7 @@ build:
     # Create redirects for better UX
     - echo '<!DOCTYPE html><html><head><meta http-equiv="refresh" content="0;url=/"></head><body>Redirecting to StockAlerts...</body></html>' > public/404.html
 
-    # Create an index page that links to both platforms
+    # Create a platform selector page
     - |
       cat > public/platforms.html << 'EOF'
       <!DOCTYPE html>
@@ -41,26 +25,34 @@ build:
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
           <title>Choose Your Platform</title>
           <style>
-              body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
-              .platform { display: inline-block; margin: 20px; padding: 30px; border: 2px solid #ddd; border-radius: 10px; text-decoration: none; color: #333; }
-              .platform:hover { border-color: #007bff; background: #f8f9fa; }
-              .platform h2 { margin: 0 0 10px; }
-              .platform p { margin: 0; color: #666; }
+              body { font-family: Arial, sans-serif; text-align: center; padding: 50px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; margin: 0; min-height: 100vh; }
+              .container { max-width: 800px; margin: 0 auto; }
+              h1 { font-size: 3rem; margin-bottom: 2rem; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
+              .platforms { display: flex; justify-content: center; gap: 40px; flex-wrap: wrap; }
+              .platform { display: block; padding: 40px; background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.2); border-radius: 20px; text-decoration: none; color: white; transition: all 0.3s ease; backdrop-filter: blur(10px); min-width: 250px; }
+              .platform:hover { transform: translateY(-10px); background: rgba(255,255,255,0.2); border-color: rgba(255,255,255,0.4); box-shadow: 0 20px 40px rgba(0,0,0,0.3); }
+              .platform h2 { margin: 0 0 15px; font-size: 2rem; }
+              .platform p { margin: 5px 0; opacity: 0.9; }
+              .platform .description { font-size: 1.1rem; margin-bottom: 10px; }
+              .platform .languages { font-size: 0.9rem; opacity: 0.7; }
+              @media (max-width: 768px) { .platforms { flex-direction: column; align-items: center; } }
           </style>
       </head>
       <body>
-          <h1>Welcome to Our Platforms</h1>
-          <div>
-              <a href="/" class="platform">
-                  <h2>📈 StockAlerts</h2>
-                  <p>Free SMS Stock Monitoring</p>
-                  <p>English / ไทย</p>
-              </a>
-              <a href="/puchokdii/" class="platform">
-                  <h2>🍀 PuChokDii</h2>
-                  <p>Thai Lottery Companion</p>
-                  <p>ไทย / English</p>
-              </a>
+          <div class="container">
+              <h1>🌟 Welcome to Our Platforms</h1>
+              <div class="platforms">
+                  <a href="/" class="platform">
+                      <h2>📈 StockAlerts</h2>
+                      <p class="description">Free SMS Stock Monitoring</p>
+                      <p class="languages">English / ไทย</p>
+                  </a>
+                  <a href="/puchokdii/" class="platform">
+                      <h2>🍀 PuChokDii</h2>
+                      <p class="description">Thai Lottery Companion</p>
+                      <p class="languages">ไทย / English</p>
+                  </a>
+              </div>
           </div>
       </body>
       </html>
@@ -73,31 +65,5 @@ build:
   artifacts:
     paths:
       - public
-    expire_in: 1 hour
   only:
     - main
-
-# Deploy to GitLab Pages
-pages:
-  stage: deploy
-  dependencies:
-    - build
-  script:
-    - echo "Deploying to GitLab Pages..."
-    - ls -la public/
-  artifacts:
-    paths:
-      - public
-  only:
-    - main
-
-# Optional: Deploy backend to Vercel (if you want automated deployment)
-deploy-backend:
-  stage: deploy
-  image: node:${NODE_VERSION}
-  script:
-    - npm install -g vercel
-    - vercel --token $VERCEL_TOKEN --prod --yes
-  only:
-    - main
-  when: manual  # Run manually when needed
