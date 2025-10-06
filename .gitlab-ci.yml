@@ -1,0 +1,103 @@
+# GitLab CI/CD Pipeline for StockAlerts & PuChokDii
+# Builds and deploys both platforms to GitLab Pages
+
+stages:
+  - build
+  - deploy
+
+variables:
+  NODE_VERSION: "18"
+
+# Build job
+build:
+  stage: build
+  image: node:${NODE_VERSION}
+  script:
+    # Install dependencies
+    - npm ci
+
+    # Create public directory for GitLab Pages
+    - mkdir -p public
+
+    # Copy StockAlerts files to root of public
+    - cp index.html public/
+    - cp dashboard.html public/
+    - cp -r assets public/
+    - cp vercel.json public/
+
+    # Copy PuChokDii to subdirectory
+    - cp -r puchokdii public/
+
+    # Create redirects for better UX
+    - echo '<!DOCTYPE html><html><head><meta http-equiv="refresh" content="0;url=/"></head><body>Redirecting to StockAlerts...</body></html>' > public/404.html
+
+    # Create an index page that links to both platforms
+    - |
+      cat > public/platforms.html << 'EOF'
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Choose Your Platform</title>
+          <style>
+              body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
+              .platform { display: inline-block; margin: 20px; padding: 30px; border: 2px solid #ddd; border-radius: 10px; text-decoration: none; color: #333; }
+              .platform:hover { border-color: #007bff; background: #f8f9fa; }
+              .platform h2 { margin: 0 0 10px; }
+              .platform p { margin: 0; color: #666; }
+          </style>
+      </head>
+      <body>
+          <h1>Welcome to Our Platforms</h1>
+          <div>
+              <a href="/" class="platform">
+                  <h2>📈 StockAlerts</h2>
+                  <p>Free SMS Stock Monitoring</p>
+                  <p>English / ไทย</p>
+              </a>
+              <a href="/puchokdii/" class="platform">
+                  <h2>🍀 PuChokDii</h2>
+                  <p>Thai Lottery Companion</p>
+                  <p>ไทย / English</p>
+              </a>
+          </div>
+      </body>
+      </html>
+      EOF
+
+    # Log what we built
+    - echo "Built StockAlerts and PuChokDii for GitLab Pages"
+    - ls -la public/
+
+  artifacts:
+    paths:
+      - public
+    expire_in: 1 hour
+  only:
+    - main
+
+# Deploy to GitLab Pages
+pages:
+  stage: deploy
+  dependencies:
+    - build
+  script:
+    - echo "Deploying to GitLab Pages..."
+    - ls -la public/
+  artifacts:
+    paths:
+      - public
+  only:
+    - main
+
+# Optional: Deploy backend to Vercel (if you want automated deployment)
+deploy-backend:
+  stage: deploy
+  image: node:${NODE_VERSION}
+  script:
+    - npm install -g vercel
+    - vercel --token $VERCEL_TOKEN --prod --yes
+  only:
+    - main
+  when: manual  # Run manually when needed
