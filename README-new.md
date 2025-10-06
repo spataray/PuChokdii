@@ -25,9 +25,9 @@
 ## 🚀 Live Deployment
 
 ### Frontend (GitLab Pages)
-- **StockAlerts**: `https://yourusername.gitlab.io/stockalerts/`
-- **PuChokDii**: `https://yourusername.gitlab.io/stockalerts/puchokdii/`
-- **Platform Selector**: `https://yourusername.gitlab.io/stockalerts/platforms.html`
+- **StockAlerts**: `https://spataray.gitlab.io/stockalerts/`
+- **PuChokDii**: `https://spataray.gitlab.io/stockalerts/puchokdii/`
+- **Platform Selector**: `https://spataray.gitlab.io/stockalerts/platforms.html`
 
 ### Backend (Vercel)
 - **API Base**: `https://stockalerts-backend-g784hxipc-spataray-5609s-projects.vercel.app`
@@ -76,7 +76,7 @@ Both platforms are fully optimized for:
 
 ```bash
 # Clone repository
-git clone https://gitlab.com/yourusername/stockalerts.git
+git clone https://gitlab.com/spataray/stockalerts.git
 cd stockalerts
 
 # Install dependencies
