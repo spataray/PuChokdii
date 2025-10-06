@@ -55,7 +55,8 @@ app.use(cors({
     origin: [
         'http://localhost:3000',
         'https://spataray.gitlab.io',
-        'https://stockalerts-backend-g784hxipc-spataray-5609s-projects.vercel.app',
+        'https://stockalerts-9afde2.gitlab.io',
+        'https://stockalerts-backend-lzej4rnu8-spataray-5609s-projects.vercel.app',
         process.env.FRONTEND_URL
     ].filter(Boolean),
     credentials: true,
