@@ -52,16 +52,12 @@ app.use(helmet({
 }));
 
 app.use(cors({
-    origin: [
-        'http://localhost:3000',
-        'https://spataray.gitlab.io',
-        'https://stockalerts-9afde2.gitlab.io',
-        'https://stockalerts-backend-lzej4rnu8-spataray-5609s-projects.vercel.app',
-        process.env.FRONTEND_URL
-    ].filter(Boolean),
+    origin: true, // Allow all origins temporarily for debugging
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization']
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+    preflightContinue: false,
+    optionsSuccessStatus: 200
 }));
 
 app.use(express.json({ limit: '10mb' }));
