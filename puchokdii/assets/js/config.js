@@ -3,7 +3,7 @@ window.PUCHOKDII_CONFIG = {
     // API Configuration - Points to shared StockAlerts backend
     API_BASE: window.location.hostname === 'localhost'
         ? 'http://localhost:3000'
-        : 'https://stockalerts-backend-n4hdollex-spataray-5609s-projects.vercel.app',
+        : 'https://stockalerts-backend-k5grbyyfr-spataray-5609s-projects.vercel.app',
 
     // Platform identifier
     PLATFORM: 'puchokdii',
