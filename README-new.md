@@ -2,9 +2,10 @@
 
 **Multi-Platform Suite**: Free SMS stock monitoring and Thai lottery companion with full bilingual support.
 
-[![Deploy to GitLab Pages](https://img.shields.io/badge/Deploy-GitLab%20Pages-orange)](https://gitlab.com)
+[![Deploy to GitLab Pages](https://img.shields.io/badge/Deploy-GitLab%20Pages-orange)](https://gitlab.com/spataray/stockalerts)
 [![Backend Status](https://img.shields.io/badge/Backend-Vercel-black)](https://stockalerts-backend-g784hxipc-spataray-5609s-projects.vercel.app)
 [![Translation Status](https://img.shields.io/badge/i18n-EN%20%7C%20TH-green)](#)
+[![Pipeline Status](https://gitlab.com/spataray/stockalerts/badges/main/pipeline.svg)](https://gitlab.com/spataray/stockalerts/-/pipelines)
 
 ## 🌟 Features
 
