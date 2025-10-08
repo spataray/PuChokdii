@@ -21,14 +21,32 @@ let transporter = null;
 
 async function initializeEmailTransporter() {
     // Debug: Check which environment variables are available
-    console.log('🔍 OAuth2 Environment Variables Check (v2):');
+    console.log('🔍 OAuth2 Environment Variables Check (v3):');
     console.log('OAUTH2_CLIENT_ID:', OAUTH2_CLIENT_ID ? 'SET' : 'MISSING');
     console.log('OAUTH2_CLIENT_SECRET:', OAUTH2_CLIENT_SECRET ? 'SET' : 'MISSING');
     console.log('OAUTH2_REFRESH_TOKEN:', OAUTH2_REFRESH_TOKEN ? 'SET' : 'MISSING');
     console.log('EMAIL_USER:', EMAIL_USER ? 'SET' : 'MISSING');
 
-    // Check if OAuth2 credentials are available
-    if (!OAUTH2_CLIENT_ID || !OAUTH2_CLIENT_SECRET || !OAUTH2_REFRESH_TOKEN || !EMAIL_USER) {
+    // Additional debugging - check process.env directly
+    console.log('🔍 Direct process.env check:');
+    console.log('process.env.OAUTH2_CLIENT_ID:', process.env.OAUTH2_CLIENT_ID ? 'SET' : 'MISSING');
+    console.log('process.env.OAUTH2_CLIENT_SECRET:', process.env.OAUTH2_CLIENT_SECRET ? 'SET' : 'MISSING');
+    console.log('process.env.OAUTH2_REFRESH_TOKEN:', process.env.OAUTH2_REFRESH_TOKEN ? 'SET' : 'MISSING');
+    console.log('process.env.EMAIL_USER:', process.env.EMAIL_USER ? 'SET' : 'MISSING');
+
+    // Show all available environment variables (first few characters only for security)
+    console.log('🔍 Available env vars starting with OAUTH2 or EMAIL:');
+    Object.keys(process.env).filter(key => key.startsWith('OAUTH2') || key.startsWith('EMAIL')).forEach(key => {
+        console.log(`${key}: ${process.env[key] ? process.env[key].substring(0, 10) + '...' : 'UNDEFINED'}`);
+    });
+
+    // Check if OAuth2 credentials are available (use process.env directly)
+    const clientId = process.env.OAUTH2_CLIENT_ID;
+    const clientSecret = process.env.OAUTH2_CLIENT_SECRET;
+    const refreshToken = process.env.OAUTH2_REFRESH_TOKEN;
+    const emailUser = process.env.EMAIL_USER;
+
+    if (!clientId || !clientSecret || !refreshToken || !emailUser) {
         console.warn('⚠️ OAuth2 email credentials not configured - magic links will be logged to console');
         console.warn('Required environment variables: OAUTH2_CLIENT_ID, OAUTH2_CLIENT_SECRET, OAUTH2_REFRESH_TOKEN, EMAIL_USER');
         return null;
@@ -36,13 +54,13 @@ async function initializeEmailTransporter() {
 
     try {
         const oAuth2Client = new google.auth.OAuth2(
-            OAUTH2_CLIENT_ID,
-            OAUTH2_CLIENT_SECRET,
+            clientId,
+            clientSecret,
             REDIRECT_URI
         );
 
         oAuth2Client.setCredentials({
-            refresh_token: OAUTH2_REFRESH_TOKEN
+            refresh_token: refreshToken
         });
 
         const accessToken = await oAuth2Client.getAccessToken();
@@ -51,10 +69,10 @@ async function initializeEmailTransporter() {
             service: 'gmail',
             auth: {
                 type: 'OAuth2',
-                user: EMAIL_USER,
-                clientId: OAUTH2_CLIENT_ID,
-                clientSecret: OAUTH2_CLIENT_SECRET,
-                refreshToken: OAUTH2_REFRESH_TOKEN,
+                user: emailUser,
+                clientId: clientId,
+                clientSecret: clientSecret,
+                refreshToken: refreshToken,
                 accessToken: accessToken.token,
             },
         });
@@ -108,7 +126,7 @@ router.post('/send-magic-link', async (req, res) => {
 
         if (emailTransporter) {
             const mailOptions = {
-                from: EMAIL_USER,
+                from: process.env.EMAIL_USER,
                 to: email,
                 subject: 'Your StockAlerts Login Link',
                 html: `
