@@ -21,7 +21,7 @@ let transporter = null;
 
 async function initializeEmailTransporter() {
     // Debug: Check which environment variables are available
-    console.log('🔍 OAuth2 Environment Variables Check:');
+    console.log('🔍 OAuth2 Environment Variables Check (v2):');
     console.log('OAUTH2_CLIENT_ID:', OAUTH2_CLIENT_ID ? 'SET' : 'MISSING');
     console.log('OAUTH2_CLIENT_SECRET:', OAUTH2_CLIENT_SECRET ? 'SET' : 'MISSING');
     console.log('OAUTH2_REFRESH_TOKEN:', OAUTH2_REFRESH_TOKEN ? 'SET' : 'MISSING');
