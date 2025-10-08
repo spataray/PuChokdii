@@ -20,6 +20,13 @@ const REDIRECT_URI = 'https://developers.google.com/oauthplayground';
 let transporter = null;
 
 async function initializeEmailTransporter() {
+    // Debug: Check which environment variables are available
+    console.log('🔍 OAuth2 Environment Variables Check:');
+    console.log('OAUTH2_CLIENT_ID:', OAUTH2_CLIENT_ID ? 'SET' : 'MISSING');
+    console.log('OAUTH2_CLIENT_SECRET:', OAUTH2_CLIENT_SECRET ? 'SET' : 'MISSING');
+    console.log('OAUTH2_REFRESH_TOKEN:', OAUTH2_REFRESH_TOKEN ? 'SET' : 'MISSING');
+    console.log('EMAIL_USER:', EMAIL_USER ? 'SET' : 'MISSING');
+
     // Check if OAuth2 credentials are available
     if (!OAUTH2_CLIENT_ID || !OAUTH2_CLIENT_SECRET || !OAUTH2_REFRESH_TOKEN || !EMAIL_USER) {
         console.warn('⚠️ OAuth2 email credentials not configured - magic links will be logged to console');
