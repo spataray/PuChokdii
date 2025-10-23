@@ -119,7 +119,7 @@ if (loginForm) {
             submitBtn.disabled = true;
 
             // Send magic link request
-            const response = await fetch('/api/auth/send-magic-link', {
+            const response = await fetch(window.APP_CONFIG.API_BASE + '/api/auth/send-magic-link', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -364,7 +364,7 @@ function checkMagicLinkToken() {
         `;
 
         // Verify token and redirect to dashboard
-        fetch('/api/auth/verify-magic-link', {
+        fetch(window.APP_CONFIG.API_BASE + '/api/auth/verify-magic-link', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
