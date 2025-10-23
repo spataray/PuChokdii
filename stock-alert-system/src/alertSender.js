@@ -1,11 +1,14 @@
 require('dotenv').config();
 const nodemailer = require('nodemailer');
+const { google } = require('googleapis');
 
-// Email configuration
-const emailUser = process.env.EMAIL_USER;
-const emailPass = process.env.EMAIL_PASS;
-const emailHost = process.env.EMAIL_HOST || 'smtp.gmail.com';
-const emailPort = process.env.EMAIL_PORT || 587;
+// OAuth2 Email configuration
+const OAUTH2_CLIENT_ID = process.env.OAUTH2_CLIENT_ID;
+const OAUTH2_CLIENT_SECRET = process.env.OAUTH2_CLIENT_SECRET;
+const OAUTH2_REFRESH_TOKEN = process.env.OAUTH2_REFRESH_TOKEN;
+const EMAIL_USER = process.env.EMAIL_USER;
+const REDIRECT_URI = 'https://developers.google.com/oauthplayground';
+
 const alertPhone = process.env.ALERT_PHONE_NUMBER;
 const carrierOverride = process.env.CARRIER_OVERRIDE; // Optional manual carrier
 
@@ -46,21 +49,45 @@ function getCarrierGateway(phoneNumber) {
     const carrier = detectCarrier(phoneNumber);
     return carrierGateways[carrier] || carrierGateways['verizon'];
 }
-function initializeEmail() {
-    if (!emailUser || !emailPass) {
-        console.warn('Email credentials not configured. Running in test mode.');
+async function initializeEmail() {
+    // Check if OAuth2 credentials are available
+    if (!OAUTH2_CLIENT_ID || !OAUTH2_CLIENT_SECRET || !OAUTH2_REFRESH_TOKEN || !EMAIL_USER) {
+        console.warn('⚠️ OAuth2 email credentials not configured. Running in test mode.');
+        console.warn('Required: OAUTH2_CLIENT_ID, OAUTH2_CLIENT_SECRET, OAUTH2_REFRESH_TOKEN, EMAIL_USER');
         return null;
     }
 
-    return nodemailer.createTransporter({
-        host: emailHost,
-        port: emailPort,
-        secure: false, // true for 465, false for other ports
-        auth: {
-            user: emailUser,
-            pass: emailPass
-        }
-    });
+    try {
+        const oAuth2Client = new google.auth.OAuth2(
+            OAUTH2_CLIENT_ID,
+            OAUTH2_CLIENT_SECRET,
+            REDIRECT_URI
+        );
+
+        oAuth2Client.setCredentials({
+            refresh_token: OAUTH2_REFRESH_TOKEN
+        });
+
+        const accessToken = await oAuth2Client.getAccessToken();
+
+        const transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                type: 'OAuth2',
+                user: EMAIL_USER,
+                clientId: OAUTH2_CLIENT_ID,
+                clientSecret: OAUTH2_CLIENT_SECRET,
+                refreshToken: OAUTH2_REFRESH_TOKEN,
+                accessToken: accessToken.token,
+            },
+        });
+
+        console.log('✅ OAuth2 email transporter initialized successfully');
+        return transporter;
+    } catch (error) {
+        console.error('❌ Failed to initialize OAuth2 email transporter:', error);
+        return null;
+    }
 }
 
 function formatTrend(value) {
@@ -103,13 +130,11 @@ ${getTrendEmoji(trends['12mo'])} 12mo: ${formatTrend(trends['12mo'])}
     console.log(message);
     console.log('='.repeat(50) + '\n');
 
-    // Initialize email transporter if not already done
-    if (!transporter) {
-        transporter = initializeEmail();
-    }
+    // Create fresh OAuth2 transporter (access tokens can expire)
+    const emailTransporter = await initializeEmail();
 
     // Send email-to-SMS if email is configured
-    if (transporter && alertPhone) {
+    if (emailTransporter && alertPhone) {
         try {
             // Clean phone number and get carrier gateway
             const cleanPhone = alertPhone.replace(/\D/g, '');
@@ -120,14 +145,14 @@ ${getTrendEmoji(trends['12mo'])} 12mo: ${formatTrend(trends['12mo'])}
             console.log(`📱 Sending to: ${emailAddress} (detected carrier: ${carrier})`);
 
             const mailOptions = {
-                from: emailUser,
+                from: EMAIL_USER,
                 to: emailAddress,
                 subject: `${symbol} Alert`, // Keep subject short for SMS
                 text: message
             };
 
-            const result = await transporter.sendMail(mailOptions);
-            console.log(`✓ Email-to-SMS sent successfully! Message ID: ${result.messageId}`);
+            const result = await emailTransporter.sendMail(mailOptions);
+            console.log(`✓ Email-to-SMS sent successfully via OAuth2! Message ID: ${result.messageId}`);
             return true;
         } catch (error) {
             console.error('✗ Error sending email-to-SMS:', error.message);
