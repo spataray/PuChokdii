@@ -1,6 +1,22 @@
 const { v4: uuidv4 } = require('uuid');
 const database = require('./index');
 
+// Helper function to format user object
+function formatUser(user) {
+    if (!user) return null;
+    return {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        phoneNumber: user.phone_number,
+        carrier: user.carrier,
+        emailReminders: user.email_reminders === 1,
+        emailSummary: user.email_summary === 1,
+        createdAt: user.created_at,
+        updatedAt: user.updated_at
+    };
+}
+
 class UserDatabase {
     // Create or get user by email
     async createOrGetUser(email) {
@@ -35,7 +51,7 @@ class UserDatabase {
             );
 
             if (user) {
-                return this.formatUser(user);
+                return formatUser(user);
             }
 
             return null;
@@ -53,7 +69,7 @@ class UserDatabase {
             );
 
             if (user) {
-                return this.formatUser(user);
+                return formatUser(user);
             }
 
             return null;
@@ -324,21 +340,6 @@ class UserDatabase {
             console.error('Error adding alert history:', error);
             throw error;
         }
-    }
-
-    // Helper method to format user object
-    formatUser(user) {
-        return {
-            id: user.id,
-            email: user.email,
-            name: user.name,
-            phoneNumber: user.phone_number,
-            carrier: user.carrier,
-            emailReminders: user.email_reminders === 1,
-            emailSummary: user.email_summary === 1,
-            createdAt: user.created_at,
-            updatedAt: user.updated_at
-        };
     }
 }
 
