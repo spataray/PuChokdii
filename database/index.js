@@ -1,8 +1,11 @@
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 
-// Use in-memory database for Vercel serverless environment
-const DB_PATH = process.env.NODE_ENV === 'production' ? ':memory:' : path.join(__dirname, 'stockalerts.db');
+// Use /tmp directory for Vercel serverless environment (persists during function lifetime)
+// For local development, use file in database directory
+const DB_PATH = process.env.NODE_ENV === 'production'
+    ? '/tmp/stockalerts.db'
+    : path.join(__dirname, 'stockalerts.db');
 
 class Database {
     constructor() {
