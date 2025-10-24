@@ -13,8 +13,14 @@ class Database {
     async connect() {
         if (this.pool) return;
 
+        // Remove sslmode from connection string to avoid conflicts
+        let connectionString = DATABASE_URL;
+        if (connectionString) {
+            connectionString = connectionString.replace(/[?&]sslmode=[^&]*/gi, '');
+        }
+
         this.pool = new Pool({
-            connectionString: DATABASE_URL,
+            connectionString: connectionString,
             ssl: {
                 rejectUnauthorized: false
             },
