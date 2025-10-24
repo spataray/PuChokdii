@@ -9,8 +9,8 @@ const OAUTH2_REFRESH_TOKEN = process.env.OAUTH2_REFRESH_TOKEN;
 const EMAIL_USER = process.env.EMAIL_USER;
 const REDIRECT_URI = 'https://developers.google.com/oauthplayground';
 
-const alertPhone = process.env.ALERT_PHONE_NUMBER;
-const carrierOverride = process.env.CARRIER_OVERRIDE; // Optional manual carrier
+// NOTE: alertPhone and carrierOverride are read dynamically in functions
+// to support runtime environment variable changes from API endpoints
 
 let transporter = null;
 
@@ -30,6 +30,9 @@ const carrierGateways = {
 
 // Auto-detect carrier based on phone number patterns (basic detection)
 function detectCarrier(phoneNumber) {
+    // Read carrier override dynamically from environment
+    const carrierOverride = process.env.CARRIER_OVERRIDE;
+
     if (carrierOverride) {
         return carrierOverride.toLowerCase();
     }
@@ -132,6 +135,9 @@ ${getTrendEmoji(trends['12mo'])} 12mo: ${formatTrend(trends['12mo'])}
 
     // Create fresh OAuth2 transporter (access tokens can expire)
     const emailTransporter = await initializeEmail();
+
+    // Read phone number dynamically from environment (set by API endpoint)
+    const alertPhone = process.env.ALERT_PHONE_NUMBER;
 
     // Send email-to-SMS if email is configured
     if (emailTransporter && alertPhone) {
