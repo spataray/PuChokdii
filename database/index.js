@@ -62,6 +62,27 @@ class Database {
         // Only create tables if they haven't been created yet
         // This is called lazily on first query
         if (!this._tablesCreated) {
+            // Quick check: if users table exists, assume all tables exist
+            try {
+                const result = await this.pool.query(`
+                    SELECT EXISTS (
+                        SELECT FROM information_schema.tables
+                        WHERE table_schema = 'public'
+                        AND table_name = 'users'
+                    );
+                `);
+
+                if (result.rows[0].exists) {
+                    // Tables already exist, skip creation
+                    console.log('✅ Database tables already exist');
+                    this._tablesCreated = true;
+                    return;
+                }
+            } catch (err) {
+                console.log('⚠️ Error checking tables, will attempt to create:', err.message);
+            }
+
+            // Tables don't exist, create them
             await this.createTables();
             this._tablesCreated = true;
         }
@@ -158,9 +179,12 @@ class Database {
 
     async run(sql, params = []) {
         // Ensure database is initialized
-        if (!this.pool) {
+        if (!this.initialized) {
             await this.initialize();
-            // Create tables on first query if needed
+        }
+
+        // Only check tables once per container lifetime
+        if (!this._tablesCreated) {
             await this.ensureTablesExist();
         }
 
@@ -178,9 +202,12 @@ class Database {
 
     async get(sql, params = []) {
         // Ensure database is initialized
-        if (!this.pool) {
+        if (!this.initialized) {
             await this.initialize();
-            // Create tables on first query if needed
+        }
+
+        // Only check tables once per container lifetime
+        if (!this._tablesCreated) {
             await this.ensureTablesExist();
         }
 
@@ -195,9 +222,12 @@ class Database {
 
     async all(sql, params = []) {
         // Ensure database is initialized
-        if (!this.pool) {
+        if (!this.initialized) {
             await this.initialize();
-            // Create tables on first query if needed
+        }
+
+        // Only check tables once per container lifetime
+        if (!this._tablesCreated) {
             await this.ensureTablesExist();
         }
 
