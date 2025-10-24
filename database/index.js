@@ -8,6 +8,7 @@ class Database {
         this.pool = null;
         this.initializing = false;
         this.initialized = false;
+        this._tablesCreated = false;
     }
 
     async connect() {
@@ -24,10 +25,12 @@ class Database {
             ssl: {
                 rejectUnauthorized: false
             },
-            // Optimize for serverless
-            max: 20,
+            // Optimize for serverless with aggressive timeouts
+            max: 10, // Reduced for serverless
+            min: 0,  // Don't keep idle connections
             idleTimeoutMillis: 30000,
-            connectionTimeoutMillis: 10000,
+            connectionTimeoutMillis: 30000, // Increased from 10s to 30s
+            allowExitOnIdle: true
         });
 
         console.log('📦 Connected to PostgreSQL database (Supabase)');
@@ -47,14 +50,25 @@ class Database {
         this.initializing = true;
         try {
             await this.connect();
-            await this.createTables();
+            // Don't create tables on every initialization - do it lazily only when needed
+            // This prevents timeout issues in serverless cold starts
             this.initialized = true;
         } finally {
             this.initializing = false;
         }
     }
 
+    async ensureTablesExist() {
+        // Only create tables if they haven't been created yet
+        // This is called lazily on first query
+        if (!this._tablesCreated) {
+            await this.createTables();
+            this._tablesCreated = true;
+        }
+    }
+
     async createTables() {
+        // Use pool.query directly to avoid circular dependency with run() method
         const tables = [
             // Users table
             `CREATE TABLE IF NOT EXISTS users (
@@ -121,7 +135,7 @@ class Database {
         ];
 
         for (const table of tables) {
-            await this.run(table);
+            await this.pool.query(table);
         }
 
         // Create indexes
@@ -136,7 +150,7 @@ class Database {
         ];
 
         for (const index of indexes) {
-            await this.run(index);
+            await this.pool.query(index);
         }
 
         console.log('✅ Database tables initialized');
@@ -146,6 +160,8 @@ class Database {
         // Ensure database is initialized
         if (!this.pool) {
             await this.initialize();
+            // Create tables on first query if needed
+            await this.ensureTablesExist();
         }
 
         try {
@@ -164,6 +180,8 @@ class Database {
         // Ensure database is initialized
         if (!this.pool) {
             await this.initialize();
+            // Create tables on first query if needed
+            await this.ensureTablesExist();
         }
 
         try {
@@ -179,6 +197,8 @@ class Database {
         // Ensure database is initialized
         if (!this.pool) {
             await this.initialize();
+            // Create tables on first query if needed
+            await this.ensureTablesExist();
         }
 
         try {
@@ -201,7 +221,7 @@ class Database {
 // Create and export database instance
 const database = new Database();
 
-// Initialize database on module load
-database.initialize().catch(console.error);
+// DON'T initialize on module load - it causes timeout in serverless cold starts
+// Initialization happens lazily on first query
 
 module.exports = database;
