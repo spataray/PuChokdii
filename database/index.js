@@ -1,32 +1,30 @@
-const sqlite3 = require('sqlite3').verbose();
-const path = require('path');
+const { Pool } = require('pg');
 
-// Use /tmp directory for Vercel serverless environment (persists during function lifetime)
-// For local development, use file in database directory
-const DB_PATH = process.env.NODE_ENV === 'production'
-    ? '/tmp/stockalerts.db'
-    : path.join(__dirname, 'stockalerts.db');
+// Use Supabase Postgres connection
+const DATABASE_URL = process.env.POSTGRES_URL || process.env.DATABASE_URL;
 
 class Database {
     constructor() {
-        this.db = null;
+        this.pool = null;
         this.initializing = false;
         this.initialized = false;
     }
 
     async connect() {
-        return new Promise((resolve, reject) => {
-            this.db = new sqlite3.Database(DB_PATH, (err) => {
-                if (err) {
-                    console.error('Error opening database:', err);
-                    reject(err);
-                } else {
-                    const dbType = DB_PATH === ':memory:' ? 'in-memory (serverless)' : 'file-based';
-                    console.log(`📦 Connected to SQLite database (${dbType})`);
-                    resolve();
-                }
-            });
+        if (this.pool) return;
+
+        this.pool = new Pool({
+            connectionString: DATABASE_URL,
+            ssl: {
+                rejectUnauthorized: false
+            },
+            // Optimize for serverless
+            max: 20,
+            idleTimeoutMillis: 30000,
+            connectionTimeoutMillis: 10000,
         });
+
+        console.log('📦 Connected to PostgreSQL database (Supabase)');
     }
 
     async initialize() {
@@ -59,10 +57,10 @@ class Database {
                 name TEXT,
                 phone_number TEXT,
                 carrier TEXT,
-                email_reminders BOOLEAN DEFAULT 1,
-                email_summary BOOLEAN DEFAULT 1,
-                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-                updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+                email_reminders BOOLEAN DEFAULT TRUE,
+                email_summary BOOLEAN DEFAULT TRUE,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )`,
 
             // Magic links table for authentication
@@ -70,9 +68,9 @@ class Database {
                 id TEXT PRIMARY KEY,
                 email TEXT NOT NULL,
                 token TEXT UNIQUE NOT NULL,
-                expires_at DATETIME NOT NULL,
-                used BOOLEAN DEFAULT 0,
-                created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+                expires_at TIMESTAMP NOT NULL,
+                used BOOLEAN DEFAULT FALSE,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )`,
 
             // User stocks table
@@ -81,11 +79,11 @@ class Database {
                 user_id TEXT NOT NULL,
                 symbol TEXT NOT NULL,
                 name TEXT,
-                threshold REAL NOT NULL,
+                threshold DECIMAL NOT NULL,
                 alert_type TEXT NOT NULL CHECK (alert_type IN ('above', 'below')),
-                is_active BOOLEAN DEFAULT 1,
-                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-                updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                is_active BOOLEAN DEFAULT TRUE,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
                 UNIQUE(user_id, symbol)
             )`,
@@ -96,13 +94,13 @@ class Database {
                 user_id TEXT NOT NULL,
                 stock_id TEXT NOT NULL,
                 symbol TEXT NOT NULL,
-                price REAL NOT NULL,
-                threshold REAL NOT NULL,
+                price DECIMAL NOT NULL,
+                threshold DECIMAL NOT NULL,
                 alert_type TEXT NOT NULL,
                 message TEXT NOT NULL,
-                sent_successfully BOOLEAN DEFAULT 0,
+                sent_successfully BOOLEAN DEFAULT FALSE,
                 error_message TEXT,
-                sent_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                sent_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
                 FOREIGN KEY (stock_id) REFERENCES user_stocks(id) ON DELETE CASCADE
             )`,
@@ -110,9 +108,9 @@ class Database {
             // Stock price cache table
             `CREATE TABLE IF NOT EXISTS stock_prices (
                 symbol TEXT PRIMARY KEY,
-                current_price REAL,
-                change_percent REAL,
-                last_updated DATETIME DEFAULT CURRENT_TIMESTAMP
+                current_price DECIMAL,
+                change_percent DECIMAL,
+                last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )`
         ];
 
@@ -140,73 +138,57 @@ class Database {
 
     async run(sql, params = []) {
         // Ensure database is initialized
-        if (!this.db) {
+        if (!this.pool) {
             await this.initialize();
         }
 
-        return new Promise((resolve, reject) => {
-            this.db.run(sql, params, function(err) {
-                if (err) {
-                    console.error('Database run error:', err);
-                    reject(err);
-                } else {
-                    resolve({ id: this.lastID, changes: this.changes });
-                }
-            });
-        });
+        try {
+            const result = await this.pool.query(sql, params);
+            return {
+                id: result.rows[0]?.id || null,
+                changes: result.rowCount || 0
+            };
+        } catch (err) {
+            console.error('Database run error:', err);
+            throw err;
+        }
     }
 
     async get(sql, params = []) {
         // Ensure database is initialized
-        if (!this.db) {
+        if (!this.pool) {
             await this.initialize();
         }
 
-        return new Promise((resolve, reject) => {
-            this.db.get(sql, params, (err, row) => {
-                if (err) {
-                    console.error('Database get error:', err);
-                    reject(err);
-                } else {
-                    resolve(row);
-                }
-            });
-        });
+        try {
+            const result = await this.pool.query(sql, params);
+            return result.rows[0] || null;
+        } catch (err) {
+            console.error('Database get error:', err);
+            throw err;
+        }
     }
 
     async all(sql, params = []) {
         // Ensure database is initialized
-        if (!this.db) {
+        if (!this.pool) {
             await this.initialize();
         }
 
-        return new Promise((resolve, reject) => {
-            this.db.all(sql, params, (err, rows) => {
-                if (err) {
-                    console.error('Database all error:', err);
-                    reject(err);
-                } else {
-                    resolve(rows);
-                }
-            });
-        });
+        try {
+            const result = await this.pool.query(sql, params);
+            return result.rows;
+        } catch (err) {
+            console.error('Database all error:', err);
+            throw err;
+        }
     }
 
-    close() {
-        return new Promise((resolve, reject) => {
-            if (this.db) {
-                this.db.close((err) => {
-                    if (err) {
-                        reject(err);
-                    } else {
-                        console.log('📦 Database connection closed');
-                        resolve();
-                    }
-                });
-            } else {
-                resolve();
-            }
-        });
+    async close() {
+        if (this.pool) {
+            await this.pool.end();
+            console.log('📦 Database connection closed');
+        }
     }
 }
 
