@@ -7,6 +7,8 @@ const DB_PATH = process.env.NODE_ENV === 'production' ? ':memory:' : path.join(_
 class Database {
     constructor() {
         this.db = null;
+        this.initializing = false;
+        this.initialized = false;
     }
 
     async connect() {
@@ -25,8 +27,24 @@ class Database {
     }
 
     async initialize() {
-        await this.connect();
-        await this.createTables();
+        // Prevent multiple initializations
+        if (this.initialized) return;
+        if (this.initializing) {
+            // Wait for existing initialization to complete
+            while (this.initializing) {
+                await new Promise(resolve => setTimeout(resolve, 50));
+            }
+            return;
+        }
+
+        this.initializing = true;
+        try {
+            await this.connect();
+            await this.createTables();
+            this.initialized = true;
+        } finally {
+            this.initializing = false;
+        }
     }
 
     async createTables() {
@@ -117,7 +135,12 @@ class Database {
         console.log('✅ Database tables initialized');
     }
 
-    run(sql, params = []) {
+    async run(sql, params = []) {
+        // Ensure database is initialized
+        if (!this.db) {
+            await this.initialize();
+        }
+
         return new Promise((resolve, reject) => {
             this.db.run(sql, params, function(err) {
                 if (err) {
@@ -130,7 +153,12 @@ class Database {
         });
     }
 
-    get(sql, params = []) {
+    async get(sql, params = []) {
+        // Ensure database is initialized
+        if (!this.db) {
+            await this.initialize();
+        }
+
         return new Promise((resolve, reject) => {
             this.db.get(sql, params, (err, row) => {
                 if (err) {
@@ -143,7 +171,12 @@ class Database {
         });
     }
 
-    all(sql, params = []) {
+    async all(sql, params = []) {
+        // Ensure database is initialized
+        if (!this.db) {
+            await this.initialize();
+        }
+
         return new Promise((resolve, reject) => {
             this.db.all(sql, params, (err, rows) => {
                 if (err) {
