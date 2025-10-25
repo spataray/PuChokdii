@@ -8,7 +8,25 @@ const userDb = require('../database/users');
 const router = express.Router();
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
-const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000';
+
+// Platform configurations
+const PLATFORMS = {
+    stockalerts: {
+        name: 'StockAlerts',
+        icon: '📈',
+        frontendUrl: process.env.FRONTEND_URL || 'https://stockalerts-9afde2.gitlab.io',
+        color: '#2563eb',
+        gradient: 'linear-gradient(135deg, #2563eb, #8b5cf6)'
+    },
+    puchokdii: {
+        name: 'PuChokDii',
+        nameThai: 'ผู้โชคดี',
+        icon: '🍀',
+        frontendUrl: 'https://stockalerts-9afde2.gitlab.io/puchokdii',
+        color: '#059669',
+        gradient: 'linear-gradient(135deg, #059669, #10b981)'
+    }
+};
 
 // OAuth2 Email configuration
 const OAUTH2_CLIENT_ID = process.env.OAUTH2_CLIENT_ID;
@@ -92,7 +110,7 @@ async function initializeEmailTransporter() {
 // Send magic link
 router.post('/send-magic-link', async (req, res) => {
     try {
-        const { email } = req.body;
+        const { email, platform } = req.body;
 
         if (!email) {
             return res.status(400).json({
@@ -110,9 +128,13 @@ router.post('/send-magic-link', async (req, res) => {
             });
         }
 
+        // Determine platform (default to stockalerts)
+        const platformKey = platform && PLATFORMS[platform] ? platform : 'stockalerts';
+        const platformConfig = PLATFORMS[platformKey];
+
         // Generate magic link token
         const token = uuidv4();
-        const magicLink = `${FRONTEND_URL}?token=${token}`;
+        const magicLink = `${platformConfig.frontendUrl}?token=${token}`;
 
         // Create or get user
         const user = await userDb.createOrGetUser(email);
@@ -125,27 +147,35 @@ router.post('/send-magic-link', async (req, res) => {
         const emailTransporter = await initializeEmailTransporter();
 
         if (emailTransporter) {
+            const platformTitle = platformConfig.nameThai
+                ? `${platformConfig.icon} ${platformConfig.name} ${platformConfig.nameThai}`
+                : `${platformConfig.icon} ${platformConfig.name}`;
+
+            const platformFooter = platformConfig.nameThai
+                ? `© 2024 ${platformConfig.name}. Free lottery companion for everyone.`
+                : `© 2024 ${platformConfig.name}. Free stock monitoring for everyone.`;
+
             const mailOptions = {
                 from: process.env.EMAIL_USER,
                 to: email,
-                subject: 'Your StockAlerts Login Link',
+                subject: `Your ${platformConfig.name} Login Link`,
                 html: `
                     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-                        <div style="background: linear-gradient(135deg, #2563eb, #8b5cf6); padding: 2rem; text-align: center; border-radius: 8px 8px 0 0;">
-                            <h1 style="color: white; margin: 0; font-size: 1.8rem;">📈 StockAlerts</h1>
+                        <div style="background: ${platformConfig.gradient}; padding: 2rem; text-align: center; border-radius: 8px 8px 0 0;">
+                            <h1 style="color: white; margin: 0; font-size: 1.8rem;">${platformTitle}</h1>
                         </div>
 
                         <div style="background: white; padding: 2rem; border-radius: 0 0 8px 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
                             <h2 style="color: #1e293b; margin-bottom: 1rem;">Welcome back!</h2>
 
                             <p style="color: #64748b; line-height: 1.6; margin-bottom: 2rem;">
-                                Click the button below to securely log in to your StockAlerts account. This link will expire in 1 hour.
+                                Click the button below to securely log in to your ${platformConfig.name} account. This link will expire in 1 hour.
                             </p>
 
                             <div style="text-align: center; margin: 2rem 0;">
                                 <a href="${magicLink}"
-                                   style="background: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: 500;">
-                                    🚀 Log In to StockAlerts
+                                   style="background: ${platformConfig.color}; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: 500;">
+                                    🚀 Log In to ${platformConfig.name}
                                 </a>
                             </div>
 
@@ -155,7 +185,7 @@ router.post('/send-magic-link', async (req, res) => {
                         </div>
 
                         <div style="text-align: center; margin-top: 1rem; color: #94a3b8; font-size: 0.75rem;">
-                            © 2024 StockAlerts. Free stock monitoring for everyone.
+                            ${platformFooter}
                         </div>
                     </div>
                 `
