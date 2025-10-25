@@ -14,10 +14,22 @@ class Database {
     async connect() {
         if (this.pool) return;
 
+        // Parse connection string and remove SSL mode conflicts
+        let connectionString = DATABASE_URL;
+        if (connectionString) {
+            // Remove sslmode parameter that conflicts with our SSL config
+            connectionString = connectionString.replace(/[?&]sslmode=[^&]*/gi, '');
+            connectionString = connectionString.replace(/[?&]supa=[^&]*/gi, '');
+            // Remove trailing ? or & if they exist
+            connectionString = connectionString.replace(/[?&]$/, '');
+        }
+
         this.pool = new Pool({
-            connectionString: DATABASE_URL,
+            connectionString: connectionString,
             ssl: {
-                rejectUnauthorized: false
+                rejectUnauthorized: false,
+                // Explicitly disable certificate validation
+                checkServerIdentity: () => undefined
             },
             // Serverless-optimized configuration for Supabase
             max: 1, // Single connection for serverless
