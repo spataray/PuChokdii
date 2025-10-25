@@ -497,7 +497,7 @@ class StockAlertsDashboard {
                         </div>
                     </div>
                     <div class="stock-threshold">
-                        <div class="threshold-value">$${stock.threshold.toFixed(2)}</div>
+                        <div class="threshold-value">$${parseFloat(stock.threshold).toFixed(2)}</div>
                         <div class="threshold-type">${stock.alertType}</div>
                     </div>
                     <div class="stock-actions">
