@@ -14,23 +14,22 @@ class Database {
     async connect() {
         if (this.pool) return;
 
-        // Remove sslmode from connection string to avoid conflicts
-        let connectionString = DATABASE_URL;
-        if (connectionString) {
-            connectionString = connectionString.replace(/[?&]sslmode=[^&]*/gi, '');
-        }
-
         this.pool = new Pool({
-            connectionString: connectionString,
+            connectionString: DATABASE_URL,
             ssl: {
                 rejectUnauthorized: false
             },
-            // Optimize for serverless with aggressive timeouts
-            max: 10, // Reduced for serverless
-            min: 0,  // Don't keep idle connections
-            idleTimeoutMillis: 30000,
-            connectionTimeoutMillis: 30000, // Increased from 10s to 30s
-            allowExitOnIdle: true
+            // Serverless-optimized configuration for Supabase
+            max: 1, // Single connection for serverless
+            min: 0,
+            idleTimeoutMillis: 10000,
+            connectionTimeoutMillis: 10000,
+            allowExitOnIdle: true,
+            // Supabase-specific settings
+            statement_timeout: 10000,
+            query_timeout: 10000,
+            keepAlive: true,
+            keepAliveInitialDelayMillis: 10000
         });
 
         console.log('📦 Connected to PostgreSQL database (Supabase)');
