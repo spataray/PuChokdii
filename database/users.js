@@ -10,8 +10,8 @@ function formatUser(user) {
         name: user.name,
         phoneNumber: user.phone_number,
         carrier: user.carrier,
-        emailReminders: user.email_reminders === 1,
-        emailSummary: user.email_summary === 1,
+        emailReminders: user.email_reminders === true || user.email_reminders === 1,
+        emailSummary: user.email_summary === true || user.email_summary === 1,
         createdAt: user.created_at,
         updatedAt: user.updated_at
     };
@@ -32,7 +32,7 @@ class UserDatabase {
             const userId = uuidv4();
 
             await database.run(
-                'INSERT INTO users (id, email) VALUES (?, ?)',
+                'INSERT INTO users (id, email) VALUES ($1, $2)',
                 [userId, email]
             );
 
@@ -46,7 +46,7 @@ class UserDatabase {
     async getUserById(userId) {
         try {
             const user = await database.get(
-                'SELECT * FROM users WHERE id = ?',
+                'SELECT * FROM users WHERE id = $1',
                 [userId]
             );
 
@@ -64,7 +64,7 @@ class UserDatabase {
     async getUserByEmail(email) {
         try {
             const user = await database.get(
-                'SELECT * FROM users WHERE email = ?',
+                'SELECT * FROM users WHERE email = $1',
                 [email.toLowerCase()]
             );
 
@@ -84,11 +84,13 @@ class UserDatabase {
             const allowedFields = ['name', 'phone_number', 'carrier', 'email_reminders', 'email_summary'];
             const updateFields = [];
             const values = [];
+            let paramIndex = 1;
 
             for (const [key, value] of Object.entries(updates)) {
                 if (allowedFields.includes(key)) {
-                    updateFields.push(`${key} = ?`);
+                    updateFields.push(`${key} = $${paramIndex}`);
                     values.push(value);
+                    paramIndex++;
                 }
             }
 
@@ -100,7 +102,7 @@ class UserDatabase {
             updateFields.push('updated_at = CURRENT_TIMESTAMP');
             values.push(userId);
 
-            const sql = `UPDATE users SET ${updateFields.join(', ')} WHERE id = ?`;
+            const sql = `UPDATE users SET ${updateFields.join(', ')} WHERE id = $${paramIndex}`;
 
             await database.run(sql, values);
 
@@ -115,7 +117,7 @@ class UserDatabase {
         try {
             // Delete user (CASCADE will handle related records)
             const result = await database.run(
-                'DELETE FROM users WHERE id = ?',
+                'DELETE FROM users WHERE id = $1',
                 [userId]
             );
 
@@ -133,7 +135,7 @@ class UserDatabase {
             const expiresAt = new Date(Date.now() + expiresIn);
 
             await database.run(
-                'INSERT INTO magic_links (id, email, token, expires_at) VALUES (?, ?, ?, ?)',
+                'INSERT INTO magic_links (id, email, token, expires_at) VALUES ($1, $2, $3, $4)',
                 [linkId, email.toLowerCase(), token, expiresAt.toISOString()]
             );
 
@@ -152,7 +154,7 @@ class UserDatabase {
     async getMagicLink(token) {
         try {
             const link = await database.get(
-                'SELECT * FROM magic_links WHERE token = ? AND used = 0 AND expires_at > datetime("now")',
+                'SELECT * FROM magic_links WHERE token = $1 AND used = FALSE AND expires_at > CURRENT_TIMESTAMP',
                 [token]
             );
 
@@ -166,7 +168,7 @@ class UserDatabase {
     async useMagicLink(token) {
         try {
             const result = await database.run(
-                'UPDATE magic_links SET used = 1 WHERE token = ?',
+                'UPDATE magic_links SET used = TRUE WHERE token = $1',
                 [token]
             );
 
@@ -180,7 +182,7 @@ class UserDatabase {
     async cleanupExpiredMagicLinks() {
         try {
             const result = await database.run(
-                'DELETE FROM magic_links WHERE expires_at < datetime("now") OR used = 1'
+                'DELETE FROM magic_links WHERE expires_at < CURRENT_TIMESTAMP OR used = TRUE'
             );
 
             return result.changes;
@@ -197,7 +199,7 @@ class UserDatabase {
                 `SELECT us.*, sp.current_price, sp.change_percent, sp.last_updated
                  FROM user_stocks us
                  LEFT JOIN stock_prices sp ON us.symbol = sp.symbol
-                 WHERE us.user_id = ? AND us.is_active = 1
+                 WHERE us.user_id = $1 AND us.is_active = TRUE
                  ORDER BY us.created_at DESC`,
                 [userId]
             );
@@ -226,7 +228,7 @@ class UserDatabase {
             const { symbol, name, threshold, alertType } = stockData;
 
             await database.run(
-                'INSERT INTO user_stocks (id, user_id, symbol, name, threshold, alert_type) VALUES (?, ?, ?, ?, ?, ?)',
+                'INSERT INTO user_stocks (id, user_id, symbol, name, threshold, alert_type) VALUES ($1, $2, $3, $4, $5, $6)',
                 [stockId, userId, symbol.toUpperCase(), name, threshold, alertType]
             );
 
@@ -238,7 +240,7 @@ class UserDatabase {
                 alertType
             };
         } catch (error) {
-            if (error.code === 'SQLITE_CONSTRAINT_UNIQUE') {
+            if (error.code === '23505') { // PostgreSQL unique violation
                 throw new Error('You are already monitoring this stock');
             }
             console.error('Error adding user stock:', error);
@@ -251,11 +253,13 @@ class UserDatabase {
             const allowedFields = ['name', 'threshold', 'alert_type'];
             const updateFields = [];
             const values = [];
+            let paramIndex = 1;
 
             for (const [key, value] of Object.entries(updates)) {
                 if (allowedFields.includes(key)) {
-                    updateFields.push(`${key} = ?`);
+                    updateFields.push(`${key} = $${paramIndex}`);
                     values.push(value);
+                    paramIndex++;
                 }
             }
 
@@ -266,7 +270,7 @@ class UserDatabase {
             updateFields.push('updated_at = CURRENT_TIMESTAMP');
             values.push(userId, stockId);
 
-            const sql = `UPDATE user_stocks SET ${updateFields.join(', ')} WHERE user_id = ? AND id = ?`;
+            const sql = `UPDATE user_stocks SET ${updateFields.join(', ')} WHERE user_id = $${paramIndex} AND id = $${paramIndex + 1}`;
 
             const result = await database.run(sql, values);
 
@@ -284,7 +288,7 @@ class UserDatabase {
     async removeUserStock(userId, stockId) {
         try {
             const result = await database.run(
-                'UPDATE user_stocks SET is_active = 0 WHERE user_id = ? AND id = ?',
+                'UPDATE user_stocks SET is_active = FALSE WHERE user_id = $1 AND id = $2',
                 [userId, stockId]
             );
 
@@ -300,9 +304,9 @@ class UserDatabase {
         try {
             const alerts = await database.all(
                 `SELECT * FROM alert_history
-                 WHERE user_id = ?
+                 WHERE user_id = $1
                  ORDER BY sent_at DESC
-                 LIMIT ?`,
+                 LIMIT $2`,
                 [userId, limit]
             );
 
@@ -313,7 +317,7 @@ class UserDatabase {
                 threshold: alert.threshold,
                 alertType: alert.alert_type,
                 message: alert.message,
-                sentSuccessfully: alert.sent_successfully === 1,
+                sentSuccessfully: alert.sent_successfully === true || alert.sent_successfully === 1,
                 errorMessage: alert.error_message,
                 sentAt: alert.sent_at
             }));
@@ -331,8 +335,8 @@ class UserDatabase {
             await database.run(
                 `INSERT INTO alert_history
                  (id, user_id, stock_id, symbol, price, threshold, alert_type, message, sent_successfully, error_message)
-                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-                [alertId, userId, stockId, symbol, price, threshold, alertType, message, sentSuccessfully ? 1 : 0, errorMessage]
+                 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
+                [alertId, userId, stockId, symbol, price, threshold, alertType, message, sentSuccessfully, errorMessage]
             );
 
             return alertId;
