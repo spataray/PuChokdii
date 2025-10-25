@@ -3,7 +3,7 @@ window.PUCHOKDII_CONFIG = {
     // API Configuration - Points to shared StockAlerts backend
     API_BASE: window.location.hostname === 'localhost'
         ? 'http://localhost:3000'
-        : 'https://stockalerts-backend-g7ohnas87-spataray-5609s-projects.vercel.app',
+        : 'https://stockalerts-rho.vercel.app',
 
     // Platform identifier
     PLATFORM: 'puchokdii',
@@ -11,7 +11,7 @@ window.PUCHOKDII_CONFIG = {
     // Frontend URL
     FRONTEND_URL: window.location.hostname === 'localhost'
         ? 'http://localhost:3000'
-        : 'https://spataray.github.io/PuChokDii',
+        : 'https://stockalerts-9afde2.gitlab.io/puchokdii',
 
     // Thai lottery specific settings
     LOTTERY: {
