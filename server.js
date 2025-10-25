@@ -73,13 +73,31 @@ app.use('/api/user', authMiddleware, userRoutes);
 app.use('/api/stocks', stockRoutes);
 app.use('/api/monitor', monitorRoutes);
 
-// Health check endpoint
-app.get('/api/health', (req, res) => {
-    res.json({
+// Health check endpoint with database test
+app.get('/api/health', async (req, res) => {
+    const health = {
         success: true,
         message: 'StockAlerts API is running',
-        timestamp: new Date().toISOString()
-    });
+        timestamp: new Date().toISOString(),
+        database: 'unknown'
+    };
+
+    try {
+        const database = require('./database');
+        await database.initialize();
+        const result = await database.pool.query('SELECT NOW() as now');
+
+        health.database = 'connected';
+        health.databaseTime = result.rows[0].now;
+
+        res.json(health);
+    } catch (error) {
+        health.success = false;
+        health.database = 'disconnected';
+        health.error = error.message;
+
+        res.status(503).json(health);
+    }
 });
 
 // Serve frontend for SPA routes
