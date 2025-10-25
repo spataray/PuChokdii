@@ -35,7 +35,7 @@ router.get('/price/:symbol', async (req, res) => {
 
         // Check database cache
         const dbPrice = await database.get(
-            'SELECT * FROM stock_prices WHERE symbol = ? AND datetime(last_updated) > datetime("now", "-5 minutes")',
+            'SELECT * FROM stock_prices WHERE symbol = $1 AND last_updated > CURRENT_TIMESTAMP - INTERVAL \'5 minutes\'',
             [upperSymbol]
         );
 
@@ -97,8 +97,12 @@ router.get('/price/:symbol', async (req, res) => {
 
         // Update database cache
         await database.run(
-            `INSERT OR REPLACE INTO stock_prices (symbol, current_price, change_percent, last_updated)
-             VALUES (?, ?, ?, ?)`,
+            `INSERT INTO stock_prices (symbol, current_price, change_percent, last_updated)
+             VALUES ($1, $2, $3, $4)
+             ON CONFLICT (symbol) DO UPDATE SET
+                current_price = $2,
+                change_percent = $3,
+                last_updated = $4`,
             [upperSymbol, currentPrice, changePercent, data.lastUpdated]
         );
 
