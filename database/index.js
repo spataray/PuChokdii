@@ -59,31 +59,10 @@ class Database {
     }
 
     async ensureTablesExist() {
-        // Only create tables if they haven't been created yet
-        // This is called lazily on first query
+        // Tables should be pre-created in Supabase
+        // This just marks them as checked so we don't run this again
         if (!this._tablesCreated) {
-            // Quick check: if users table exists, assume all tables exist
-            try {
-                const result = await this.pool.query(`
-                    SELECT EXISTS (
-                        SELECT FROM information_schema.tables
-                        WHERE table_schema = 'public'
-                        AND table_name = 'users'
-                    );
-                `);
-
-                if (result.rows[0].exists) {
-                    // Tables already exist, skip creation
-                    console.log('✅ Database tables already exist');
-                    this._tablesCreated = true;
-                    return;
-                }
-            } catch (err) {
-                console.log('⚠️ Error checking tables, will attempt to create:', err.message);
-            }
-
-            // Tables don't exist, create them
-            await this.createTables();
+            console.log('✅ Using pre-created database tables');
             this._tablesCreated = true;
         }
     }
