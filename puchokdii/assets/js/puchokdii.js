@@ -9,12 +9,105 @@ class PuChokDii {
         this.init();
     }
 
-    init() {
+    async init() {
+        // Check for magic link token in URL
+        await this.checkMagicLinkToken();
+
         this.initEventListeners();
         this.loadLatestDraw();
         this.initAnimations();
 
+        // Update UI if logged in
+        if (this.authToken) {
+            await this.loadUserData();
+        }
+
         console.log('🍀 PuChokDii initialized - ผู้โชคดีแห่งความรู้และโชคลาภ');
+    }
+
+    async checkMagicLinkToken() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const token = urlParams.get('token');
+
+        if (token) {
+            try {
+                // Verify the magic link token
+                const response = await fetch(`${window.PUCHOKDII_CONFIG.API_BASE}/api/auth/verify-magic-link`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ token })
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.token) {
+                    // Store auth token
+                    localStorage.setItem('puchokdii_token', data.token);
+                    this.authToken = data.token;
+                    this.user = data.user;
+
+                    // Remove token from URL
+                    window.history.replaceState({}, document.title, window.location.pathname);
+
+                    // Show success message
+                    showNotification('เข้าสู่ระบบสำเร็จ! / Login successful!', 'success');
+                } else {
+                    throw new Error(data.message || 'Invalid login link');
+                }
+            } catch (error) {
+                console.error('Magic link verification error:', error);
+                showNotification('ลิงก์เข้าสู่ระบบไม่ถูกต้องหรือหมดอายุ / Invalid or expired login link', 'error');
+                // Remove invalid token from URL
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+        }
+    }
+
+    async loadUserData() {
+        try {
+            const response = await fetch(`${window.PUCHOKDII_CONFIG.API_BASE}/api/user/profile`, {
+                headers: {
+                    'Authorization': `Bearer ${this.authToken}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            const data = await response.json();
+
+            if (response.ok && data.user) {
+                this.user = data.user;
+                this.updateUIForLoggedInUser();
+            } else {
+                // Invalid token, clear it
+                localStorage.removeItem('puchokdii_token');
+                this.authToken = null;
+            }
+        } catch (error) {
+            console.error('Load user data error:', error);
+        }
+    }
+
+    updateUIForLoggedInUser() {
+        const loginBtn = document.getElementById('loginBtn');
+        if (loginBtn && this.user) {
+            loginBtn.innerHTML = `
+                <i class="fas fa-user"></i>
+                <span>${this.user.email}</span>
+            `;
+            loginBtn.onclick = () => this.showUserMenu();
+        }
+    }
+
+    showUserMenu() {
+        // Simple logout for now
+        if (confirm('ออกจากระบบ? / Logout?')) {
+            localStorage.removeItem('puchokdii_token');
+            this.authToken = null;
+            this.user = null;
+            location.reload();
+        }
     }
 
     initEventListeners() {
@@ -458,11 +551,28 @@ function initPuChokDii() {
         // Create language toggle in navigation
         const languageToggleContainer = document.getElementById('languageToggle');
         if (languageToggleContainer) {
-            window.translator.createLanguageToggle(languageToggleContainer, {
-                showFlags: true,
-                showText: true,
-                buttonClass: 'language-toggle',
-                activeClass: 'active'
+            const currentLang = window.translator.getCurrentLanguage();
+            languageToggleContainer.innerHTML = `
+                <div class="language-toggle">
+                    <button class="lang-btn ${currentLang === 'en' ? 'active' : ''}" data-lang="en">
+                        🇺🇸 EN
+                    </button>
+                    <button class="lang-btn ${currentLang === 'th' ? 'active' : ''}" data-lang="th">
+                        🇹🇭 ไทย
+                    </button>
+                </div>
+            `;
+
+            // Add event listeners for language switching
+            languageToggleContainer.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const lang = btn.dataset.lang;
+                    window.translator.setLanguage(lang);
+
+                    // Update button states
+                    languageToggleContainer.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                });
             });
         }
     }
