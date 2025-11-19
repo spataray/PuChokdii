@@ -1,0 +1,22 @@
+# GitLab Pages deployment for PhuChokDii
+pages:
+  script:
+    # Create public directory for GitLab Pages
+    - mkdir -p public
+
+    # Copy all files to public
+    - cp index.html public/
+    - cp -r assets public/
+
+    # Create 404 page that redirects to home
+    - echo '<!DOCTYPE html><html lang="th"><head><meta charset="UTF-8"><meta http-equiv="refresh" content="0;url=/"><title>PhuChokDii - กำลังเปลี่ยนเส้นทาง...</title></head><body style="font-family: Sarabun, sans-serif; text-align: center; padding: 50px;"><h1>🍀 กำลังเปลี่ยนเส้นทางไปยัง PhuChokDii...</h1><p>Redirecting to PhuChokDii...</p></body></html>' > public/404.html
+
+    # Log what we built
+    - echo "✅ Built PhuChokDii for GitLab Pages"
+    - ls -la public/
+
+  artifacts:
+    paths:
+      - public
+  only:
+    - main

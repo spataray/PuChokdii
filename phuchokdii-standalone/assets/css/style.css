@@ -1,0 +1,1698 @@
+/* PhuChokDii v2 - Thai Temple of Fortune 🪷 */
+:root {
+    /* Thai Royal Colors */
+    --primary: #7C3AED;        /* Royal Purple (สีม่วง) */
+    --primary-dark: #6B21A8;   /* Deep Purple */
+    --primary-light: #A78BFA;  /* Light Purple */
+    --gold: #FFD700;           /* Temple Gold (สีทอง) */
+    --gold-dark: #DAA520;      /* Goldenrod */
+    --crimson: #DC143C;        /* Thai Crimson (สีแดง) */
+    --lotus-pink: #FFB6C1;     /* Lotus Pink (สีชมพูบัว) */
+    --saffron: #FF9933;        /* Monk Robes (สีเหลืองกุ๊น) */
+
+    /* Neutral Thai Palette */
+    --bg: #FFF8F0;             /* Warm cream like Thai silk */
+    --card-bg: #FFFFFF;
+    --text: #2D1810;           /* Dark brown like teak wood */
+    --text-light: #8B7355;     /* Light brown */
+    --border: #E8D5C4;         /* Warm beige */
+    --success: #059669;        /* Keep for results */
+    --error: #DC2626;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Sarabun', 'Inter', -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    /* Thai silk texture with golden shimmer */
+    background-image:
+        radial-gradient(circle at 20% 50%, rgba(255, 215, 0, 0.05) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(255, 215, 0, 0.04) 0%, transparent 50%),
+        radial-gradient(circle at 40% 80%, rgba(255, 153, 51, 0.03) 0%, transparent 50%),
+        repeating-linear-gradient(
+            90deg,
+            transparent,
+            transparent 2px,
+            rgba(255, 215, 0, 0.03) 2px,
+            rgba(255, 215, 0, 0.03) 4px
+        );
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* Navbar - Thai Temple Inspired */
+.navbar {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: white;
+    padding: 1rem 0;
+    box-shadow:
+        0 4px 20px rgba(124, 58, 237, 0.3),
+        0 2px 10px rgba(255, 215, 0, 0.2);
+    position: relative;
+    border-bottom: 4px solid var(--gold);
+}
+
+/* Thai temple roof accent with shimmer */
+.navbar::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg,
+        transparent,
+        var(--gold) 10%,
+        #FFD700 30%,
+        var(--saffron) 50%,
+        #FFD700 70%,
+        var(--gold) 90%,
+        transparent
+    );
+    box-shadow: 0 2px 8px rgba(255, 215, 0, 0.5);
+}
+
+.navbar .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 2rem;
+}
+
+.nav-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 700;
+}
+
+.logo {
+    font-size: 2.5rem;
+    filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.6));
+    animation: lotusGlow 3s ease-in-out infinite;
+}
+
+@keyframes lotusGlow {
+    0%, 100% { filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.6)); }
+    50% { filter: drop-shadow(0 0 12px rgba(255, 215, 0, 0.9)); }
+}
+
+.brand-name {
+    font-size: 1.8rem;
+    font-weight: 700;
+    text-shadow:
+        2px 2px 4px rgba(0,0,0,0.3),
+        0 0 20px rgba(255, 215, 0, 0.4),
+        0 0 30px rgba(255, 215, 0, 0.2);
+    background: linear-gradient(180deg, #FFFFFF 0%, #FFD700 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.brand-thai {
+    font-size: 1.3rem;
+    font-weight: 600;
+    opacity: 0.95;
+    color: var(--gold);
+    text-shadow:
+        1px 1px 2px rgba(0,0,0,0.3),
+        0 0 10px rgba(255, 215, 0, 0.5);
+}
+
+/* Language Switcher */
+.language-switcher {
+    display: flex;
+    gap: 0.5rem;
+    background: rgba(255,255,255,0.1);
+    padding: 0.25rem;
+    border-radius: 8px;
+}
+
+.lang-btn {
+    padding: 0.5rem 1rem;
+    border: none;
+    background: transparent;
+    color: white;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.lang-btn:hover {
+    background: rgba(255,255,255,0.1);
+}
+
+.lang-btn.active {
+    background: rgba(255,255,255,0.2);
+}
+
+/* User Section */
+.btn-login {
+    padding: 0.5rem 1.5rem;
+    border: 2px solid white;
+    background: transparent;
+    color: white;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.2s;
+}
+
+.btn-login:hover {
+    background: white;
+    color: var(--primary);
+}
+
+/* Hero */
+.hero {
+    text-align: center;
+    padding: 3rem 0;
+    background: white;
+    position: relative;
+    border-bottom: 3px solid var(--gold);
+    box-shadow: inset 0 -3px 15px rgba(255, 215, 0, 0.1);
+    /* Golden lotus watermark background */
+    background-image:
+        radial-gradient(circle at 50% 50%, rgba(255, 215, 0, 0.06) 0%, transparent 70%),
+        radial-gradient(circle at 50% 50%, rgba(124, 58, 237, 0.03) 0%, transparent 70%);
+}
+
+.hero h1 {
+    font-size: 3rem;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--gold) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    text-shadow: 0 2px 10px rgba(255, 215, 0, 0.3);
+    filter: drop-shadow(0 2px 4px rgba(255, 215, 0, 0.2));
+}
+
+.hero h1 small {
+    font-size: 1.2rem;
+    color: var(--gold-dark);
+    font-weight: 600;
+    text-shadow: 0 1px 3px rgba(255, 215, 0, 0.3);
+}
+
+.hero p {
+    font-size: 1.2rem;
+    color: var(--text-light);
+}
+
+/* Checker Section */
+.checker {
+    padding: 3rem 0;
+}
+
+.checker-card {
+    background: var(--card-bg);
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 8px 24px rgba(124, 58, 237, 0.12);
+    margin-bottom: 2rem;
+    border: 3px solid transparent;
+    background-image:
+        linear-gradient(white, white),
+        linear-gradient(135deg, var(--gold), var(--primary), var(--lotus-pink));
+    background-origin: border-box;
+    background-clip: padding-box, border-box;
+    position: relative;
+}
+
+/* Thai Kanok corner decorations */
+.checker-card::before,
+.checker-card::after {
+    content: '✦';
+    position: absolute;
+    font-size: 2rem;
+    color: var(--gold);
+    opacity: 0.5;
+    text-shadow:
+        0 0 10px rgba(255, 215, 0, 0.8),
+        0 0 20px rgba(255, 215, 0, 0.4);
+    animation: sparkle 2s ease-in-out infinite;
+}
+
+@keyframes sparkle {
+    0%, 100% { opacity: 0.5; transform: scale(1); }
+    50% { opacity: 0.8; transform: scale(1.1); }
+}
+
+.checker-card::before {
+    top: 1rem;
+    left: 1rem;
+}
+
+.checker-card::after {
+    bottom: 1rem;
+    right: 1rem;
+}
+
+.checker-card h2 {
+    font-size: 2rem;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--gold) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 0.5rem;
+    filter: drop-shadow(0 2px 4px rgba(255, 215, 0, 0.3));
+}
+
+.checker-card > p {
+    color: var(--text-light);
+    margin-bottom: 2rem;
+}
+
+.input-group {
+    display: flex;
+    gap: 1rem;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.input-group input {
+    flex: 1;
+    padding: 1rem;
+    font-size: 1.5rem;
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    text-align: center;
+    font-weight: 700;
+    letter-spacing: 0.2rem;
+}
+
+.input-group input:focus {
+    outline: none;
+    border-color: var(--primary);
+}
+
+.btn-primary {
+    padding: 1rem 2rem;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    color: white;
+    border: 2px solid var(--gold);
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s;
+    box-shadow:
+        0 4px 12px rgba(124, 58, 237, 0.3),
+        0 0 20px rgba(255, 215, 0, 0.2);
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-primary::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent, rgba(255, 215, 0, 0.3), transparent);
+    transform: rotate(45deg);
+    transition: all 0.5s;
+}
+
+.btn-primary:hover::before {
+    left: 100%;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, var(--gold) 0%, var(--saffron) 100%);
+    transform: translateY(-2px);
+    box-shadow:
+        0 6px 20px rgba(255, 215, 0, 0.4),
+        0 0 30px rgba(255, 215, 0, 0.3);
+    border-color: #FFF;
+}
+
+/* Result */
+.result {
+    margin-top: 2rem;
+    padding: 2rem;
+    border-radius: 12px;
+    text-align: center;
+}
+
+.result.hidden {
+    display: none;
+}
+
+.result.winner {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+}
+
+.result.no-win {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: white;
+}
+
+.result-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+}
+
+.result h3 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+}
+
+.result-prize {
+    font-size: 1.5rem;
+    margin: 1rem 0;
+    font-weight: 700;
+}
+
+.result-amount {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--gold);
+}
+
+/* Latest Draw */
+.latest-draw {
+    background: var(--card-bg);
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 8px 24px rgba(124, 58, 237, 0.12);
+    border: 3px solid transparent;
+    background-image:
+        linear-gradient(white, white),
+        linear-gradient(135deg, var(--gold), var(--primary), var(--lotus-pink));
+    background-origin: border-box;
+    background-clip: padding-box, border-box;
+    position: relative;
+}
+
+/* Decorative lotus corners */
+.latest-draw::before,
+.latest-draw::after {
+    content: '🪷';
+    position: absolute;
+    font-size: 1.5rem;
+    opacity: 0.2;
+}
+
+.latest-draw::before {
+    top: 1rem;
+    right: 1rem;
+}
+
+.latest-draw::after {
+    bottom: 1rem;
+    left: 1rem;
+}
+
+.latest-draw h3 {
+    font-size: 1.8rem;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--gold) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 1rem;
+    filter: drop-shadow(0 2px 4px rgba(255, 215, 0, 0.3));
+}
+
+.draw-date {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-light);
+    margin-bottom: 2rem;
+}
+
+.prizes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+}
+
+.prize-item {
+    background: linear-gradient(135deg, #FFFAF5, #FFF8F0);
+    padding: 1.5rem;
+    border-radius: 12px;
+    text-align: center;
+    border: 2px solid var(--gold);
+    box-shadow: 0 4px 12px rgba(255, 215, 0, 0.15);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Thai silk pattern background */
+.prize-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image:
+        repeating-linear-gradient(
+            45deg,
+            transparent,
+            transparent 10px,
+            rgba(124, 58, 237, 0.02) 10px,
+            rgba(124, 58, 237, 0.02) 20px
+        );
+    pointer-events: none;
+}
+
+.prize-label {
+    display: block;
+    font-size: 0.9rem;
+    color: var(--text-light);
+    margin-bottom: 0.5rem;
+    position: relative;
+    z-index: 1;
+}
+
+.prize-number {
+    display: block;
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 0.5rem;
+    letter-spacing: 0.1rem;
+    position: relative;
+    z-index: 1;
+    text-shadow: 0 2px 4px rgba(124, 58, 237, 0.1);
+}
+
+.prize-amount {
+    display: block;
+    font-size: 1rem;
+    color: var(--crimson);
+    font-weight: 700;
+    position: relative;
+    z-index: 1;
+}
+
+/* Lucky Number Generator */
+.generator {
+    padding: 3rem 0;
+    background: linear-gradient(135deg, #FFF8F0, #FFFBF5);
+}
+
+.generator-card {
+    background: var(--card-bg);
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 8px 24px rgba(124, 58, 237, 0.12);
+    text-align: center;
+    border: 3px solid transparent;
+    background-image:
+        linear-gradient(white, white),
+        linear-gradient(135deg, var(--saffron), var(--gold), var(--primary));
+    background-origin: border-box;
+    background-clip: padding-box, border-box;
+    position: relative;
+}
+
+/* Lucky charm decoration */
+.generator-card::before {
+    content: '✨';
+    position: absolute;
+    top: 1rem;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 2rem;
+    opacity: 0.3;
+}
+
+.generator-card h2 {
+    font-size: 2rem;
+    background: linear-gradient(135deg, var(--saffron) 0%, var(--gold) 50%, var(--primary) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    filter: drop-shadow(0 2px 6px rgba(255, 215, 0, 0.4));
+}
+
+.generator-card > p {
+    color: var(--text-light);
+    margin-bottom: 2rem;
+}
+
+.generated-numbers {
+    margin: 2rem auto;
+}
+
+.number-display {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.number-display .digit {
+    width: 50px;
+    height: 70px;
+    background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+    color: white;
+    font-size: 2rem;
+    font-weight: 700;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease;
+}
+
+.number-display .digit.animate {
+    animation: digitFlip 0.5s ease;
+}
+
+@keyframes digitFlip {
+    0%, 100% { transform: rotateX(0); }
+    50% { transform: rotateX(90deg); }
+}
+
+.btn-large {
+    padding: 1rem 3rem;
+    font-size: 1.2rem;
+}
+
+/* Number Analytics */
+.analytics {
+    padding: 3rem 0;
+}
+
+.analytics-card {
+    background: var(--card-bg);
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 8px 24px rgba(124, 58, 237, 0.12);
+    border: 3px solid transparent;
+    background-image:
+        linear-gradient(white, white),
+        linear-gradient(135deg, var(--lotus-pink), var(--primary), var(--gold));
+    background-origin: border-box;
+    background-clip: padding-box, border-box;
+    position: relative;
+}
+
+/* Decorative stars */
+.analytics-card::before,
+.analytics-card::after {
+    content: '⭐';
+    position: absolute;
+    font-size: 1.5rem;
+    opacity: 0.2;
+}
+
+.analytics-card::before {
+    top: 1rem;
+    left: 1rem;
+}
+
+.analytics-card::after {
+    bottom: 1rem;
+    right: 1rem;
+}
+
+.analytics-card h2 {
+    font-size: 2rem;
+    background: linear-gradient(135deg, var(--gold) 0%, var(--primary) 50%, var(--lotus-pink) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    filter: drop-shadow(0 2px 6px rgba(255, 215, 0, 0.4));
+}
+
+.analytics-card > p {
+    color: var(--text-light);
+    margin-bottom: 2rem;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+}
+
+.stat-item {
+    text-align: center;
+    padding: 1.5rem;
+    background: linear-gradient(135deg, #FFFAF5, #FFF5EB);
+    border-radius: 12px;
+    border: 2px solid var(--lotus-pink);
+    box-shadow: 0 4px 12px rgba(255, 182, 193, 0.2);
+}
+
+.stat-label {
+    display: block;
+    font-size: 0.9rem;
+    color: var(--text-light);
+    margin-bottom: 1rem;
+    font-weight: 600;
+}
+
+.stat-numbers {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+.stat-digit {
+    width: 40px;
+    height: 50px;
+    background: var(--primary);
+    color: white;
+    font-size: 1.5rem;
+    font-weight: 700;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.stat-pairs {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-top: 1rem;
+}
+
+.pair-badge {
+    padding: 0.5rem 1rem;
+    background: linear-gradient(135deg, var(--saffron), var(--gold));
+    color: white;
+    font-weight: 700;
+    border-radius: 6px;
+    font-size: 1.1rem;
+    box-shadow: 0 2px 8px rgba(255, 153, 51, 0.3);
+}
+
+.stat-value {
+    margin-top: 1rem;
+}
+
+.sum-number {
+    font-size: 3rem;
+    font-weight: 700;
+    color: var(--primary);
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.stat-value small {
+    color: var(--text-light);
+    font-size: 0.85rem;
+}
+
+/* Footer */
+.footer {
+    background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+    color: white;
+    text-align: center;
+    padding: 2rem 0;
+    margin-top: 4rem;
+    border-top: 3px solid var(--gold);
+    position: relative;
+}
+
+/* Thai temple footer decoration */
+.footer::before {
+    content: '';
+    position: absolute;
+    top: -3px;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg,
+        transparent,
+        var(--gold) 25%,
+        var(--saffron) 50%,
+        var(--gold) 75%,
+        transparent
+    );
+}
+
+/* Dream to Numbers */
+.dream-section {
+    padding: 3rem 0;
+    background: linear-gradient(135deg, #FFF5F7, #FFF0F3);
+}
+
+.dream-card {
+    background: var(--card-bg);
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 8px 24px rgba(124, 58, 237, 0.12);
+    border: 3px solid transparent;
+    background-image:
+        linear-gradient(white, white),
+        linear-gradient(135deg, var(--lotus-pink), var(--primary), var(--gold));
+    background-origin: border-box;
+    background-clip: padding-box, border-box;
+    position: relative;
+}
+
+.dream-card h2 {
+    font-size: 2rem;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--lotus-pink) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    justify-content: center;
+    filter: drop-shadow(0 2px 6px rgba(255, 182, 193, 0.4));
+}
+
+.dream-card > p {
+    text-align: center;
+    color: var(--text-light);
+    margin-bottom: 2rem;
+}
+
+.dream-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 1rem;
+    margin: 2rem 0;
+}
+
+.dream-btn {
+    padding: 1.5rem 1rem;
+    background: linear-gradient(135deg, #FFFBF5, #FFF8F0);
+    border: 2px solid var(--lotus-pink);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 2.5rem;
+    box-shadow: 0 4px 12px rgba(255, 182, 193, 0.2);
+}
+
+.dream-btn span {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--primary);
+}
+
+.dream-btn:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(255, 182, 193, 0.3);
+    border-color: var(--primary);
+}
+
+.dream-result {
+    margin-top: 2rem;
+    padding: 2rem;
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: white;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 8px 20px rgba(124, 58, 237, 0.3);
+}
+
+.dream-result.hidden {
+    display: none;
+}
+
+.dream-result h3 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.dream-numbers {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-top: 1rem;
+}
+
+.dream-number {
+    padding: 1rem 1.5rem;
+    background: var(--gold);
+    color: var(--text);
+    font-size: 1.5rem;
+    font-weight: 700;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(255, 215, 0, 0.4);
+}
+
+/* Lucky Color of the Day */
+.color-section {
+    padding: 3rem 0;
+}
+
+.color-card {
+    background: var(--card-bg);
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 8px 24px rgba(124, 58, 237, 0.12);
+    border: 3px solid transparent;
+    background-image:
+        linear-gradient(white, white),
+        linear-gradient(135deg, var(--gold), var(--saffron), var(--primary));
+    background-origin: border-box;
+    background-clip: padding-box, border-box;
+}
+
+.color-card h2 {
+    font-size: 2rem;
+    background: linear-gradient(135deg, var(--saffron) 0%, var(--gold) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    justify-content: center;
+    filter: drop-shadow(0 2px 6px rgba(255, 153, 51, 0.4));
+}
+
+.color-card > p {
+    text-align: center;
+    color: var(--text-light);
+    margin-bottom: 2rem;
+}
+
+.today-color {
+    text-align: center;
+}
+
+.color-display {
+    width: 200px;
+    height: 200px;
+    margin: 0 auto 1.5rem;
+    border-radius: 50%;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    border: 5px solid var(--gold);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 4rem;
+    animation: colorPulse 2s ease-in-out infinite;
+}
+
+@keyframes colorPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+.color-name {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.color-desc {
+    font-size: 1.1rem;
+    color: var(--text-light);
+    margin-bottom: 1.5rem;
+}
+
+.color-numbers {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.color-number {
+    padding: 1rem 1.5rem;
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: white;
+    font-size: 1.5rem;
+    font-weight: 700;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
+}
+
+/* Jackpot Visualizer */
+.jackpot-section {
+    padding: 3rem 0;
+    background: linear-gradient(135deg, #FFFEF5, #FFF9E6);
+}
+
+.jackpot-card {
+    background: var(--card-bg);
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 8px 24px rgba(124, 58, 237, 0.12);
+    border: 3px solid transparent;
+    background-image:
+        linear-gradient(white, white),
+        linear-gradient(135deg, var(--gold), var(--primary), var(--saffron));
+    background-origin: border-box;
+    background-clip: padding-box, border-box;
+}
+
+.jackpot-card h2 {
+    font-size: 2rem;
+    background: linear-gradient(135deg, var(--gold) 0%, var(--crimson) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    justify-content: center;
+    filter: drop-shadow(0 2px 6px rgba(255, 215, 0, 0.4));
+}
+
+.jackpot-card > p {
+    text-align: center;
+    color: var(--text-light);
+    margin-bottom: 2rem;
+}
+
+.jackpot-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.jackpot-item {
+    background: linear-gradient(135deg, #FFFBF5, #FFF5EB);
+    padding: 1.5rem;
+    border-radius: 12px;
+    text-align: center;
+    border: 2px solid var(--gold);
+    box-shadow: 0 4px 12px rgba(255, 215, 0, 0.15);
+    transition: all 0.3s;
+}
+
+.jackpot-item:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(255, 215, 0, 0.25);
+}
+
+.jackpot-icon {
+    font-size: 3rem;
+    margin-bottom: 0.5rem;
+}
+
+.jackpot-name {
+    font-weight: 600;
+    color: var(--primary);
+    margin-bottom: 0.5rem;
+}
+
+.jackpot-count {
+    color: var(--gold-dark);
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+
+.money-visual {
+    text-align: center;
+    padding: 2rem;
+    background: linear-gradient(135deg, var(--gold), var(--saffron));
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(255, 215, 0, 0.3);
+}
+
+.money-stack {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    animation: moneyFloat 2s ease-in-out infinite;
+}
+
+@keyframes moneyFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+.money-amount {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: white;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Lucky Number Combos */
+.combos-section {
+    padding: 3rem 0;
+}
+
+.combos-card {
+    background: var(--card-bg);
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 8px 24px rgba(124, 58, 237, 0.12);
+    border: 3px solid transparent;
+    background-image:
+        linear-gradient(white, white),
+        linear-gradient(135deg, var(--primary), var(--gold), var(--saffron));
+    background-origin: border-box;
+    background-clip: padding-box, border-box;
+}
+
+.combos-card h2 {
+    font-size: 2rem;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--gold) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    justify-content: center;
+    filter: drop-shadow(0 2px 6px rgba(255, 215, 0, 0.4));
+}
+
+.combos-card > p {
+    text-align: center;
+    color: var(--text-light);
+    margin-bottom: 2rem;
+}
+
+.combos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+    margin: 2rem 0;
+}
+
+.combo-btn {
+    padding: 1.5rem 1rem;
+    background: linear-gradient(135deg, #FFFBF5, #FFF8F0);
+    border: 2px solid var(--primary);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 2.5rem;
+    box-shadow: 0 4px 12px rgba(124, 58, 237, 0.2);
+}
+
+.combo-btn span {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--primary);
+}
+
+.combo-btn small {
+    font-size: 0.85rem;
+    color: var(--text-light);
+    font-weight: 400;
+}
+
+.combo-btn:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(124, 58, 237, 0.3);
+    border-color: var(--gold);
+}
+
+.combo-result {
+    margin-top: 2rem;
+    padding: 2rem;
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: white;
+    border-radius: 12px;
+    text-align: center;
+}
+
+.combo-result.hidden {
+    display: none;
+}
+
+/* Thai Zodiac */
+.zodiac-section {
+    padding: 3rem 0;
+    background: linear-gradient(135deg, #FFF9F0, #FFFEF5);
+}
+
+.zodiac-card {
+    background: var(--card-bg);
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 8px 24px rgba(124, 58, 237, 0.12);
+    border: 3px solid transparent;
+    background-image:
+        linear-gradient(white, white),
+        linear-gradient(135deg, var(--crimson), var(--gold), var(--primary));
+    background-origin: border-box;
+    background-clip: padding-box, border-box;
+}
+
+.zodiac-card h2 {
+    font-size: 2rem;
+    background: linear-gradient(135deg, var(--crimson) 0%, var(--gold) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    justify-content: center;
+    filter: drop-shadow(0 2px 6px rgba(220, 20, 60, 0.4));
+}
+
+.zodiac-card > p {
+    text-align: center;
+    color: var(--text-light);
+    margin-bottom: 2rem;
+}
+
+.zodiac-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 1rem;
+    margin: 2rem 0;
+}
+
+.zodiac-btn {
+    padding: 1.5rem 0.5rem;
+    background: linear-gradient(135deg, #FFFBF5, #FFF5EB);
+    border: 2px solid var(--crimson);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 2rem;
+    box-shadow: 0 4px 12px rgba(220, 20, 60, 0.15);
+}
+
+.zodiac-btn span {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--crimson);
+}
+
+.zodiac-btn:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(220, 20, 60, 0.25);
+    border-color: var(--gold);
+}
+
+.zodiac-result {
+    margin-top: 2rem;
+    padding: 2rem;
+    background: linear-gradient(135deg, var(--crimson), #B91C1C);
+    color: white;
+    border-radius: 12px;
+    text-align: center;
+}
+
+.zodiac-result.hidden {
+    display: none;
+}
+
+/* Number Scanner */
+.scanner-section {
+    padding: 3rem 0;
+}
+
+.scanner-card {
+    background: var(--card-bg);
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 8px 24px rgba(124, 58, 237, 0.12);
+    border: 3px solid transparent;
+    background-image:
+        linear-gradient(white, white),
+        linear-gradient(135deg, var(--gold), var(--primary), var(--lotus-pink));
+    background-origin: border-box;
+    background-clip: padding-box, border-box;
+}
+
+.scanner-card h2 {
+    font-size: 2rem;
+    background: linear-gradient(135deg, var(--gold) 0%, var(--primary) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    justify-content: center;
+    filter: drop-shadow(0 2px 6px rgba(255, 215, 0, 0.4));
+}
+
+.scanner-card > p {
+    text-align: center;
+    color: var(--text-light);
+    margin-bottom: 2rem;
+}
+
+.scanner-input {
+    display: flex;
+    gap: 1rem;
+    max-width: 500px;
+    margin: 0 auto 1rem;
+}
+
+.scanner-input input {
+    flex: 1;
+    padding: 1rem;
+    font-size: 1.5rem;
+    border: 2px solid var(--gold);
+    border-radius: 8px;
+    text-align: center;
+    font-weight: 700;
+    letter-spacing: 0.2rem;
+}
+
+.btn-scan {
+    padding: 1rem 2rem;
+    background: linear-gradient(135deg, var(--gold) 0%, var(--saffron) 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s;
+    box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
+}
+
+.btn-scan:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 215, 0, 0.4);
+}
+
+.scanner-examples {
+    text-align: center;
+    margin: 1rem 0 2rem;
+}
+
+.scanner-examples p {
+    color: var(--text-light);
+    font-size: 0.9rem;
+}
+
+.scan-result {
+    margin-top: 2rem;
+    padding: 2rem;
+    border-radius: 12px;
+    text-align: center;
+}
+
+.scan-result.hidden {
+    display: none;
+}
+
+/* Spin the Wheel */
+.wheel-section {
+    padding: 3rem 0;
+    background: linear-gradient(135deg, #FFF5F7, #FFF0F3);
+}
+
+.wheel-card {
+    background: var(--card-bg);
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 8px 24px rgba(124, 58, 237, 0.12);
+    border: 3px solid transparent;
+    background-image:
+        linear-gradient(white, white),
+        linear-gradient(135deg, var(--saffron), var(--gold), var(--primary));
+    background-origin: border-box;
+    background-clip: padding-box, border-box;
+}
+
+.wheel-card h2 {
+    font-size: 2rem;
+    background: linear-gradient(135deg, var(--saffron) 0%, var(--primary) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    justify-content: center;
+    filter: drop-shadow(0 2px 6px rgba(255, 153, 51, 0.4));
+}
+
+.wheel-card > p {
+    text-align: center;
+    color: var(--text-light);
+    margin-bottom: 2rem;
+}
+
+.wheel-container {
+    position: relative;
+    width: 300px;
+    height: 300px;
+    margin: 2rem auto;
+}
+
+.wheel {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    border: 8px solid var(--gold);
+    position: relative;
+    background: conic-gradient(
+        from 0deg,
+        var(--primary) 0deg 36deg,
+        var(--gold) 36deg 72deg,
+        var(--crimson) 72deg 108deg,
+        var(--saffron) 108deg 144deg,
+        var(--lotus-pink) 144deg 180deg,
+        var(--primary) 180deg 216deg,
+        var(--gold) 216deg 252deg,
+        var(--crimson) 252deg 288deg,
+        var(--saffron) 288deg 324deg,
+        var(--lotus-pink) 324deg 360deg
+    );
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    transition: transform 3s cubic-bezier(0.17, 0.67, 0.12, 0.99);
+}
+
+.wheel-segment {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform-origin: 0 0;
+    color: white;
+    font-size: 2rem;
+    font-weight: 700;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.wheel-pointer {
+    position: absolute;
+    top: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 3rem;
+    color: var(--crimson);
+    z-index: 10;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+}
+
+.btn-spin {
+    display: block;
+    margin: 2rem auto;
+    padding: 1rem 3rem;
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: white;
+    border: 2px solid var(--gold);
+    border-radius: 8px;
+    font-size: 1.2rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.btn-spin:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(124, 58, 237, 0.4);
+}
+
+.btn-spin:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.wheel-result {
+    margin-top: 2rem;
+    padding: 2rem;
+    background: linear-gradient(135deg, var(--gold), var(--saffron));
+    color: white;
+    border-radius: 12px;
+    text-align: center;
+}
+
+.wheel-result.hidden {
+    display: none;
+}
+
+/* Fortune Sticks */
+.fortune-section {
+    padding: 3rem 0;
+}
+
+.fortune-card {
+    background: var(--card-bg);
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 8px 24px rgba(124, 58, 237, 0.12);
+    border: 3px solid transparent;
+    background-image:
+        linear-gradient(white, white),
+        linear-gradient(135deg, var(--lotus-pink), var(--primary), var(--gold));
+    background-origin: border-box;
+    background-clip: padding-box, border-box;
+}
+
+.fortune-card h2 {
+    font-size: 2rem;
+    background: linear-gradient(135deg, var(--lotus-pink) 0%, var(--primary) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    justify-content: center;
+    filter: drop-shadow(0 2px 6px rgba(255, 182, 193, 0.4));
+}
+
+.fortune-card > p {
+    text-align: center;
+    color: var(--text-light);
+    margin-bottom: 2rem;
+}
+
+.fortune-container {
+    width: 200px;
+    height: 200px;
+    margin: 2rem auto;
+    position: relative;
+}
+
+.fortune-sticks {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    gap: 0.5rem;
+}
+
+.stick {
+    font-size: 3rem;
+    transition: transform 0.3s;
+}
+
+.stick.shake {
+    animation: stickShake 0.5s ease-in-out;
+}
+
+@keyframes stickShake {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    25% { transform: translateY(-20px) rotate(5deg); }
+    50% { transform: translateY(-10px) rotate(-5deg); }
+    75% { transform: translateY(-15px) rotate(3deg); }
+}
+
+.btn-shake {
+    display: block;
+    margin: 2rem auto;
+    padding: 1rem 3rem;
+    background: linear-gradient(135deg, var(--lotus-pink), #FFB6C1);
+    color: white;
+    border: 2px solid var(--gold);
+    border-radius: 8px;
+    font-size: 1.2rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 4px 12px rgba(255, 182, 193, 0.3);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.btn-shake:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 182, 193, 0.4);
+}
+
+.fortune-result {
+    margin-top: 2rem;
+    padding: 2rem;
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: white;
+    border-radius: 12px;
+    text-align: center;
+}
+
+.fortune-result.hidden {
+    display: none;
+}
+
+/* Number Meanings */
+.meanings-section {
+    padding: 3rem 0;
+    background: linear-gradient(135deg, #FFFBF5, #FFF8F0);
+}
+
+.meanings-card {
+    background: var(--card-bg);
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 8px 24px rgba(124, 58, 237, 0.12);
+    border: 3px solid transparent;
+    background-image:
+        linear-gradient(white, white),
+        linear-gradient(135deg, var(--gold), var(--saffron), var(--crimson));
+    background-origin: border-box;
+    background-clip: padding-box, border-box;
+}
+
+.meanings-card h2 {
+    font-size: 2rem;
+    background: linear-gradient(135deg, var(--gold) 0%, var(--crimson) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    justify-content: center;
+    filter: drop-shadow(0 2px 6px rgba(255, 215, 0, 0.4));
+}
+
+.meanings-card > p {
+    text-align: center;
+    color: var(--text-light);
+    margin-bottom: 2rem;
+}
+
+.meanings-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 1rem;
+    max-width: 600px;
+    margin: 2rem auto;
+}
+
+.meaning-btn {
+    padding: 2rem 1rem;
+    background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+    color: white;
+    border: 2px solid var(--crimson);
+    border-radius: 12px;
+    font-size: 2rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
+}
+
+.meaning-btn:hover {
+    transform: translateY(-4px) scale(1.1);
+    box-shadow: 0 8px 20px rgba(255, 215, 0, 0.4);
+}
+
+.meaning-result {
+    margin-top: 2rem;
+    padding: 2rem;
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: white;
+    border-radius: 12px;
+}
+
+.meaning-result.hidden {
+    display: none;
+}
+
+.meaning-result h3 {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.meaning-result p {
+    font-size: 1.1rem;
+    line-height: 1.8;
+    margin-bottom: 0.5rem;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+    .navbar .container {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .hero h1 {
+        font-size: 2rem;
+    }
+
+    .input-group {
+        flex-direction: column;
+    }
+
+    .prizes-grid {
+        grid-template-columns: 1fr;
+    }
+}

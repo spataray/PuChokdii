@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>PhuChokDii v2 - ผู้โชคดี | Thai Lottery</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="assets/css/style.css?v=1761465000" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">
+                <span class="logo">🪷</span>
+                <span class="brand-name">PhuChokDii</span>
+                <span class="brand-thai">ผู้โชคดี</span>
+            </div>
+
+            <!-- Language Switcher -->
+            <div class="language-switcher">
+                <button class="lang-btn active" data-lang="th">🇹🇭 ไทย</button>
+                <button class="lang-btn" data-lang="en">🇺🇸 EN</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <h1>
+                <span data-i18n="hero-title">ตรวจหวยไทย</span>
+                <small data-i18n="hero-subtitle">Thai Lottery Checker</small>
+            </h1>
+            <p data-i18n="hero-description">ตรวจสอบผลรางวัลสลากกินแบ่งรัฐบาลไทย รวดเร็ว แม่นยำ</p>
+        </div>
+    </section>
+
+    <!-- Lottery Checker -->
+    <section class="checker">
+        <div class="container">
+            <div class="checker-card">
+                <h2 data-i18n="check-title">ตรวจหวยของคุณ</h2>
+                <p data-i18n="check-subtitle">กรอกหมายเลข 6 หลัก</p>
+
+                <form id="checkForm">
+                    <div class="input-group">
+                        <input
+                            type="tel"
+                            id="lotteryNumber"
+                            maxlength="6"
+                            placeholder="123456"
+                            data-i18n-placeholder="check-placeholder"
+                            required
+                        >
+                        <button type="submit" class="btn-primary">
+                            <i class="fas fa-search"></i>
+                            <span data-i18n="check-button">ตรวจสอบ</span>
+                        </button>
+                    </div>
+                </form>
+
+                <div id="result" class="result hidden"></div>
+            </div>
+
+            <!-- Latest Draw Info -->
+            <div class="latest-draw">
+                <h3 data-i18n="latest-draw">ผลรางวัลล่าสุด</h3>
+                <div class="draw-date">
+                    <i class="fas fa-calendar"></i>
+                    <span id="drawDate">งวดวันที่ 16 ตุลาคม 2567</span>
+                </div>
+
+                <div class="prizes-grid">
+                    <div class="prize-item">
+                        <span class="prize-label" data-i18n="prize-first">รางวัลที่ 1</span>
+                        <span class="prize-number">123456</span>
+                        <span class="prize-amount">6,000,000 ฿</span>
+                    </div>
+                    <div class="prize-item">
+                        <span class="prize-label" data-i18n="prize-2digit">เลขท้าย 2 ตัว</span>
+                        <span class="prize-number">56</span>
+                        <span class="prize-amount">2,000 ฿</span>
+                    </div>
+                    <div class="prize-item">
+                        <span class="prize-label" data-i18n="prize-3front">เลขหน้า 3 ตัว</span>
+                        <span class="prize-number">123</span>
+                        <span class="prize-amount">4,000 ฿</span>
+                    </div>
+                    <div class="prize-item">
+                        <span class="prize-label" data-i18n="prize-3back">เลขท้าย 3 ตัว</span>
+                        <span class="prize-number">456</span>
+                        <span class="prize-amount">4,000 ฿</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Lucky Number Generator -->
+    <section class="generator">
+        <div class="container">
+            <div class="generator-card">
+                <h2>
+                    <i class="fas fa-dice"></i>
+                    <span data-i18n="generator-title">สุ่มเลขนำโชค</span>
+                </h2>
+                <p data-i18n="generator-subtitle">ให้เราช่วยเลือกเลขโชคดีให้คุณ</p>
+
+                <div class="generated-numbers" id="generatedNumbers">
+                    <div class="number-display">
+                        <span class="digit">-</span>
+                        <span class="digit">-</span>
+                        <span class="digit">-</span>
+                        <span class="digit">-</span>
+                        <span class="digit">-</span>
+                        <span class="digit">-</span>
+                    </div>
+                </div>
+
+                <button class="btn-primary btn-large" id="generateBtn">
+                    <i class="fas fa-magic"></i>
+                    <span data-i18n="generator-button">สุ่มเลขโชคดี</span>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Dream to Numbers -->
+    <section class="dream-section">
+        <div class="container">
+            <div class="dream-card">
+                <h2>
+                    <i class="fas fa-moon"></i>
+                    <span data-i18n="dream-title">ฝันเห็นอะไร?</span>
+                </h2>
+                <p data-i18n="dream-subtitle">ฝันบอกเลข - ตีความฝันเป็นตัวเลขนำโชค</p>
+
+                <div class="dream-grid">
+                    <button class="dream-btn" data-dream="snake">
+                        🐍
+                        <span data-i18n="dream-snake">งู</span>
+                    </button>
+                    <button class="dream-btn" data-dream="water">
+                        💧
+                        <span data-i18n="dream-water">น้ำ</span>
+                    </button>
+                    <button class="dream-btn" data-dream="monk">
+                        🙏
+                        <span data-i18n="dream-monk">พระ</span>
+                    </button>
+                    <button class="dream-btn" data-dream="elephant">
+                        🐘
+                        <span data-i18n="dream-elephant">ช้าง</span>
+                    </button>
+                    <button class="dream-btn" data-dream="fish">
+                        🐟
+                        <span data-i18n="dream-fish">ปลา</span>
+                    </button>
+                    <button class="dream-btn" data-dream="money">
+                        💰
+                        <span data-i18n="dream-money">เงิน</span>
+                    </button>
+                    <button class="dream-btn" data-dream="temple">
+                        🛕
+                        <span data-i18n="dream-temple">วัด</span>
+                    </button>
+                    <button class="dream-btn" data-dream="bird">
+                        🦅
+                        <span data-i18n="dream-bird">นก</span>
+                    </button>
+                </div>
+
+                <div id="dreamResult" class="dream-result hidden"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Lucky Color of the Day -->
+    <section class="color-section">
+        <div class="container">
+            <div class="color-card">
+                <h2>
+                    <i class="fas fa-palette"></i>
+                    <span data-i18n="color-title">สีมงคลประจำวัน</span>
+                </h2>
+                <p data-i18n="color-subtitle">สีนำโชคตามวันเกิด</p>
+
+                <div id="todayColor" class="today-color">
+                    <div class="color-display"></div>
+                    <h3 class="color-name"></h3>
+                    <p class="color-desc"></p>
+                    <div class="color-numbers"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Jackpot Visualizer -->
+    <section class="jackpot-section">
+        <div class="container">
+            <div class="jackpot-card">
+                <h2>
+                    <i class="fas fa-trophy"></i>
+                    <span data-i18n="jackpot-title">ถ้าถูกรางวัลที่ 1</span>
+                </h2>
+                <p data-i18n="jackpot-subtitle">คุณจะซื้ออะไรได้บ้าง? (6,000,000 ฿)</p>
+
+                <div class="jackpot-grid">
+                    <div class="jackpot-item">
+                        <div class="jackpot-icon">🏠</div>
+                        <div class="jackpot-name" data-i18n="jackpot-house">บ้าน</div>
+                        <div class="jackpot-count">1-2 หลัง</div>
+                    </div>
+                    <div class="jackpot-item">
+                        <div class="jackpot-icon">🚗</div>
+                        <div class="jackpot-name" data-i18n="jackpot-car">รถยนต์</div>
+                        <div class="jackpot-count">3-6 คัน</div>
+                    </div>
+                    <div class="jackpot-item">
+                        <div class="jackpot-icon">✈️</div>
+                        <div class="jackpot-name" data-i18n="jackpot-travel">ท่องเที่ยว</div>
+                        <div class="jackpot-count">รอบโลก 2 รอบ</div>
+                    </div>
+                    <div class="jackpot-item">
+                        <div class="jackpot-icon">🍜</div>
+                        <div class="jackpot-name" data-i18n="jackpot-noodles">ก๋วยเตี๋ยว</div>
+                        <div class="jackpot-count">120,000 ชาม</div>
+                    </div>
+                    <div class="jackpot-item">
+                        <div class="jackpot-icon">📱</div>
+                        <div class="jackpot-name" data-i18n="jackpot-iphone">iPhone</div>
+                        <div class="jackpot-count">120 เครื่อง</div>
+                    </div>
+                    <div class="jackpot-item">
+                        <div class="jackpot-icon">🎓</div>
+                        <div class="jackpot-name" data-i18n="jackpot-education">การศึกษา</div>
+                        <div class="jackpot-count">ปริญญาตรี 4 ปี</div>
+                    </div>
+                </div>
+
+                <div class="money-visual">
+                    <div class="money-stack">💵💵💵💵💵</div>
+                    <div class="money-amount">6,000,000 ฿</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Lucky Number Combos -->
+    <section class="combos-section">
+        <div class="container">
+            <div class="combos-card">
+                <h2>
+                    <i class="fas fa-star"></i>
+                    <span data-i18n="combos-title">สูตรเลขนำโชค</span>
+                </h2>
+                <p data-i18n="combos-subtitle">เลือกสูตรเลขโชคดีที่เหมาะกับคุณ</p>
+
+                <div class="combos-grid">
+                    <button class="combo-btn" data-combo="dragon">
+                        🐉
+                        <span data-i18n="combo-dragon">มังกรทอง</span>
+                        <small data-i18n="combo-dragon-desc">เลขคู่+เลขคี่</small>
+                    </button>
+                    <button class="combo-btn" data-combo="phoenix">
+                        🔥
+                        <span data-i18n="combo-phoenix">ฟินิกซ์เกิดใหม่</span>
+                        <small data-i18n="combo-phoenix-desc">เลขเรียงกัน</small>
+                    </button>
+                    <button class="combo-btn" data-combo="lucky7">
+                        🍀
+                        <span data-i18n="combo-lucky7">เลข 7 นำโชค</span>
+                        <small data-i18n="combo-lucky7-desc">มีเลข 7</small>
+                    </button>
+                    <button class="combo-btn" data-combo="royal">
+                        👑
+                        <span data-i18n="combo-royal">ราชันย์</span>
+                        <small data-i18n="combo-royal-desc">เลขสูง (5-9)</small>
+                    </button>
+                </div>
+
+                <div id="comboResult" class="combo-result hidden"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Thai Zodiac -->
+    <section class="zodiac-section">
+        <div class="container">
+            <div class="zodiac-card">
+                <h2>
+                    <i class="fas fa-yin-yang"></i>
+                    <span data-i18n="zodiac-title">ปีนักษัตรของคุณ</span>
+                </h2>
+                <p data-i18n="zodiac-subtitle">เลขมงคลตามปีเกิด (พ.ศ.)</p>
+
+                <div class="zodiac-grid">
+                    <button class="zodiac-btn" data-animal="rat">🐀<span data-i18n="zodiac-rat">ชวด (หนู)</span></button>
+                    <button class="zodiac-btn" data-animal="ox">🐂<span data-i18n="zodiac-ox">ฉลู (วัว)</span></button>
+                    <button class="zodiac-btn" data-animal="tiger">🐅<span data-i18n="zodiac-tiger">ขาล (เสือ)</span></button>
+                    <button class="zodiac-btn" data-animal="rabbit">🐇<span data-i18n="zodiac-rabbit">เถาะ (กระต่าย)</span></button>
+                    <button class="zodiac-btn" data-animal="dragon">🐉<span data-i18n="zodiac-dragon">มะโรง (มังกร)</span></button>
+                    <button class="zodiac-btn" data-animal="snake">🐍<span data-i18n="zodiac-snake">มะเส็ง (งู)</span></button>
+                    <button class="zodiac-btn" data-animal="horse">🐴<span data-i18n="zodiac-horse">มะเมีย (ม้า)</span></button>
+                    <button class="zodiac-btn" data-animal="goat">🐐<span data-i18n="zodiac-goat">มะแม (แพะ)</span></button>
+                    <button class="zodiac-btn" data-animal="monkey">🐵<span data-i18n="zodiac-monkey">วอก (ลิง)</span></button>
+                    <button class="zodiac-btn" data-animal="rooster">🐓<span data-i18n="zodiac-rooster">ระกา (ไก่)</span></button>
+                    <button class="zodiac-btn" data-animal="dog">🐕<span data-i18n="zodiac-dog">จอ (สุนัข)</span></button>
+                    <button class="zodiac-btn" data-animal="pig">🐖<span data-i18n="zodiac-pig">กุน (หมู)</span></button>
+                </div>
+
+                <div id="zodiacResult" class="zodiac-result hidden"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Number Scanner -->
+    <section class="scanner-section">
+        <div class="container">
+            <div class="scanner-card">
+                <h2>
+                    <i class="fas fa-camera"></i>
+                    <span data-i18n="scanner-title">สแกนเลขรอบตัว</span>
+                </h2>
+                <p data-i18n="scanner-subtitle">ใส่เลขที่เห็นรอบตัวคุณ</p>
+
+                <div class="scanner-input">
+                    <input type="tel" id="scanNumber" maxlength="6" placeholder="123456" data-i18n-placeholder="scanner-placeholder">
+                    <button class="btn-scan" id="scanBtn">
+                        <i class="fas fa-search"></i>
+                        <span data-i18n="scanner-button">ตรวจสอบ</span>
+                    </button>
+                </div>
+
+                <div class="scanner-examples">
+                    <p data-i18n="scanner-examples">ตัวอย่าง: ป้ายทะเบียน, เบอร์โทร, บ้านเลขที่</p>
+                </div>
+
+                <div id="scanResult" class="scan-result hidden"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Spin the Wheel -->
+    <section class="wheel-section">
+        <div class="container">
+            <div class="wheel-card">
+                <h2>
+                    <i class="fas fa-dharmachakra"></i>
+                    <span data-i18n="wheel-title">วงล้อเลขนำโชค</span>
+                </h2>
+                <p data-i18n="wheel-subtitle">หมุนวงล้อเพื่อรับเลขโชคดี</p>
+
+                <div class="wheel-container">
+                    <div class="wheel" id="luckyWheel">
+                        <div class="wheel-segment">0</div>
+                        <div class="wheel-segment">1</div>
+                        <div class="wheel-segment">2</div>
+                        <div class="wheel-segment">3</div>
+                        <div class="wheel-segment">4</div>
+                        <div class="wheel-segment">5</div>
+                        <div class="wheel-segment">6</div>
+                        <div class="wheel-segment">7</div>
+                        <div class="wheel-segment">8</div>
+                        <div class="wheel-segment">9</div>
+                    </div>
+                    <div class="wheel-pointer">▼</div>
+                </div>
+
+                <button class="btn-spin" id="spinBtn">
+                    <i class="fas fa-sync-alt"></i>
+                    <span data-i18n="wheel-button">หมุนวงล้อ</span>
+                </button>
+
+                <div id="wheelResult" class="wheel-result hidden"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Fortune Sticks -->
+    <section class="fortune-section">
+        <div class="container">
+            <div class="fortune-card">
+                <h2>
+                    <i class="fas fa-hands-praying"></i>
+                    <span data-i18n="fortune-title">เขย่าซื้ำซี</span>
+                </h2>
+                <p data-i18n="fortune-subtitle">เขย่าโทรศัพท์เพื่อขอพร</p>
+
+                <div class="fortune-container">
+                    <div class="fortune-sticks" id="fortuneSticks">
+                        <div class="stick">🎋</div>
+                        <div class="stick">🎋</div>
+                        <div class="stick">🎋</div>
+                        <div class="stick">🎋</div>
+                        <div class="stick">🎋</div>
+                    </div>
+                </div>
+
+                <button class="btn-shake" id="shakeBtn">
+                    <i class="fas fa-hand-sparkles"></i>
+                    <span data-i18n="fortune-button">เขย่าเพื่อขอพร</span>
+                </button>
+
+                <div id="fortuneResult" class="fortune-result hidden"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Number Meanings -->
+    <section class="meanings-section">
+        <div class="container">
+            <div class="meanings-card">
+                <h2>
+                    <i class="fas fa-book-open"></i>
+                    <span data-i18n="meanings-title">ความหมายของตัวเลข</span>
+                </h2>
+                <p data-i18n="meanings-subtitle">ค้นหาความหมายเชิงวัฒนธรรมไทย</p>
+
+                <div class="meanings-grid">
+                    <button class="meaning-btn" data-number="0">0</button>
+                    <button class="meaning-btn" data-number="1">1</button>
+                    <button class="meaning-btn" data-number="2">2</button>
+                    <button class="meaning-btn" data-number="3">3</button>
+                    <button class="meaning-btn" data-number="4">4</button>
+                    <button class="meaning-btn" data-number="5">5</button>
+                    <button class="meaning-btn" data-number="6">6</button>
+                    <button class="meaning-btn" data-number="7">7</button>
+                    <button class="meaning-btn" data-number="8">8</button>
+                    <button class="meaning-btn" data-number="9">9</button>
+                </div>
+
+                <div id="meaningResult" class="meaning-result hidden"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 PhuChokDii - ผู้โชคดี | <span data-i18n="footer-text">เพื่อความบันเทิงเท่านั้น</span></p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="assets/js/translations.js?v=1761465000"></script>
+    <script src="assets/js/app.js?v=1761465000"></script>
+</body>
+</html>
