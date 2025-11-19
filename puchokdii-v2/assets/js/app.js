@@ -320,16 +320,6 @@ function showResult(result) {
     resultDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
-// Login button (placeholder)
-const loginBtn = document.getElementById('loginBtn');
-if (loginBtn) {
-    loginBtn.addEventListener('click', () => {
-        alert(currentLang === 'th'
-            ? 'ฟีเจอร์เข้าสู่ระบบจะมาเร็วๆ นี้!'
-            : 'Login feature coming soon!');
-    });
-}
-
 // Lucky Number Generator
 const generateBtn = document.getElementById('generateBtn');
 if (generateBtn) {
