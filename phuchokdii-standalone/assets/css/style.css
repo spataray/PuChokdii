@@ -1692,6 +1692,16 @@ body {
         flex-direction: column;
     }
 
+    .input-group input {
+        font-size: 1.2rem;
+        padding: 0.75rem;
+    }
+
+    .btn-primary {
+        padding: 0.75rem 1.5rem;
+        font-size: 1rem;
+    }
+
     .prizes-grid {
         grid-template-columns: 1fr;
     }
