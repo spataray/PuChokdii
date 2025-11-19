@@ -66,5 +66,5 @@ pages:
   artifacts:
     paths:
       - public
-  only:
-    - main
+  except:
+    - tags
